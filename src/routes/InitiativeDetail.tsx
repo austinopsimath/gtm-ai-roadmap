@@ -100,11 +100,11 @@ export default function InitiativeDetail() {
             values={initiative.audiencesServed}
           />
           <ChipsDetail
-            label="Technologies / Vendors"
+            label="Technologies / Vendors for Build"
             values={initiative.technologies}
           />
           <ChipsDetail
-            label="Systems touched"
+            label="Systems Touched During Operation"
             values={initiative.systemsTouched}
           />
           <Detail label="Level 3 metric" value={initiative.level3Metric} />

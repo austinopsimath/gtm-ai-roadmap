@@ -210,22 +210,22 @@ export default function InitiativeForm({
         />
         <Combobox
           mode="multi"
-          label="Technologies / Vendors"
+          label="Technologies / Vendors for Build"
           options={technologyOptions}
           selected={values.technologies}
           onChange={(v) => setField('technologies', v)}
           onCreateOption={(v) => addCustomOption('technologies', v)}
-          help="Tools used to build or power this initiative — LLM platforms, vendor products, integration platforms."
+          help="Tools used to build or power this initiative — LLM platforms, vendor products, dev tooling, infrastructure."
           placeholder="Select technologies..."
         />
         <Combobox
           mode="multi"
-          label="Systems touched"
+          label="Systems Touched During Operation"
           options={systemOptions}
           selected={values.systemsTouched}
           onChange={(v) => setField('systemsTouched', v)}
           onCreateOption={(v) => addCustomOption('systems', v)}
-          help="Where this initiative lives in ongoing operations — the CRM, SEP, conversation intelligence, communication, and data systems involved when reps actually use it."
+          help="Where this initiative lives in ongoing operations — CRM, SEP, conversation intelligence, communication, and data systems reps use day-to-day."
           placeholder="Select systems..."
         />
         <Combobox

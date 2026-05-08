@@ -14,11 +14,17 @@ export const DEFAULT_AUDIENCES = [
 ];
 
 export const DEFAULT_TECHNOLOGIES = [
-  'OpenAI',
-  'Anthropic',
+  'OpenAI / ChatGPT',
+  'Claude',
+  'Claude CoWork',
+  'Claude Code',
   'Google Gemini',
   'Custom RAG',
   'Internal LLM gateway',
+  'Cursor',
+  'GitHub',
+  'Neon',
+  'Railway',
   'Salesforce Einstein',
   'HubSpot AI',
   'Gong',
@@ -34,6 +40,7 @@ export const DEFAULT_TECHNOLOGIES = [
   'n8n',
   'Zapier',
   'Make',
+  'Other',
 ];
 
 export const DEFAULT_SYSTEMS = [
@@ -49,12 +56,14 @@ export const DEFAULT_SYSTEMS = [
   'Clari',
   'Slack',
   'Microsoft Teams',
+  'GitHub',
   'Google Workspace',
   'Microsoft 365',
   'Zoom',
   'Snowflake',
   'Looker',
   'Tableau',
+  'Other',
 ];
 
 export const DEFAULT_LEVEL3_METRICS = [
