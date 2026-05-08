@@ -39,6 +39,7 @@ export interface InitiativeFormValues {
   systemsTouched: string[];
   level3Metric: string;
   intakeDate: string | null;
+  deployStartDate: string | null;
   pilotStartDate: string | null;
   gaDate: string | null;
   lastReviewedDate: string | null;
@@ -71,6 +72,7 @@ export default function InitiativeForm({
     systemsTouched: initial?.systemsTouched ?? [],
     level3Metric: initial?.level3Metric ?? '',
     intakeDate: initial?.intakeDate ?? todayISO(),
+    deployStartDate: initial?.deployStartDate ?? null,
     pilotStartDate: initial?.pilotStartDate ?? null,
     gaDate: initial?.gaDate ?? null,
     lastReviewedDate: initial?.lastReviewedDate ?? null,
@@ -248,6 +250,16 @@ export default function InitiativeForm({
               value={values.intakeDate ?? ''}
               onChange={(e) =>
                 setField('intakeDate', e.target.value || null)
+              }
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Deploy start date">
+            <input
+              type="date"
+              value={values.deployStartDate ?? ''}
+              onChange={(e) =>
+                setField('deployStartDate', e.target.value || null)
               }
               className={inputClass}
             />

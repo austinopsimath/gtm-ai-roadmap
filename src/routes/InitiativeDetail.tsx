@@ -144,6 +144,7 @@ function ProfileSection({ initiative }: { initiative: Initiative }) {
 
         <Card title="Key dates">
           <Detail label="Intake" value={initiative.intakeDate} />
+          <Detail label="Deploy start" value={initiative.deployStartDate} />
           <Detail label="Pilot start" value={initiative.pilotStartDate} />
           <Detail label="GA" value={initiative.gaDate} />
           <Detail label="Last reviewed" value={initiative.lastReviewedDate} />

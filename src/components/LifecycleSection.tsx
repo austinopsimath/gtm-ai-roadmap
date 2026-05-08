@@ -15,6 +15,7 @@ import {
 } from '../lib/lifecycle';
 import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import { formatRelativeTime } from '../lib/time';
+import TimelineEditor from './TimelineEditor';
 
 interface Props {
   initiative: Initiative;
@@ -213,6 +214,7 @@ function StagePanel({
       )}
 
       {info.stage === 'prioritize' && <CaretBreakdown initiative={initiative} />}
+      {info.stage === 'roadmap' && <TimelineEditor initiative={initiative} />}
 
       {info.offlineNote && isViewingCurrent && (
         <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">

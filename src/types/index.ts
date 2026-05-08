@@ -55,6 +55,7 @@ export interface Initiative {
   scoredBy: string;
   level3Metric: string;
   intakeDate: string | null;
+  deployStartDate: string | null;
   pilotStartDate: string | null;
   gaDate: string | null;
   lastReviewedDate: string | null;
@@ -181,6 +182,7 @@ export const createInitiative = (
     scoredBy: partial.scoredBy ?? '',
     level3Metric: partial.level3Metric ?? '',
     intakeDate: partial.intakeDate ?? todayISO(),
+    deployStartDate: partial.deployStartDate ?? null,
     pilotStartDate: partial.pilotStartDate ?? null,
     gaDate: partial.gaDate ?? null,
     lastReviewedDate: partial.lastReviewedDate ?? null,

@@ -129,6 +129,10 @@ export function getStageInfo(
     }
 
     case 'roadmap': {
+      const timelineSet =
+        !!initiative.deployStartDate &&
+        !!initiative.pilotStartDate &&
+        !!initiative.gaDate;
       const tasks: LifecycleTask[] = [
         { label: 'CARET panel scored', isComplete: isScored(initiative) },
         { label: 'Initiative Owner named', isComplete: ownerNamed(initiative) },
@@ -141,9 +145,8 @@ export function getStageInfo(
           isComplete: pathChosen(initiative),
         },
         {
-          label: 'Placed on roadmap calendar',
-          isComplete: false,
-          comingSoon: true,
+          label: 'Placed on roadmap calendar (Deploy / Pilot / GA dates set)',
+          isComplete: timelineSet,
         },
         {
           label: 'PRD approved with conditional Accountability Compact',
