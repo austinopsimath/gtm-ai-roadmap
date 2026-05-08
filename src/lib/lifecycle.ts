@@ -89,7 +89,7 @@ export function getStageInfo(
       const advanceAction = isCurrent && scored
         ? {
             kind: 'advance' as const,
-            label: 'Advance to Stage 2 (Roadmap) →',
+            label: 'Advance to Stage 2 (Calendar) →',
             target: 'roadmap',
           }
         : undefined;
@@ -108,7 +108,7 @@ export function getStageInfo(
         headline: !scored
           ? 'Score this initiative with CARET'
           : isCurrent
-            ? 'Stage 1 complete — advance to Roadmap'
+            ? 'Stage 1 complete — advance to Calendar'
             : 'Stage 1: Prioritize',
         body: !scored
           ? "Capture each panelist's scores across the five factors. The wizard computes a Priority Score and flags divergence so the panel can resolve it before the score is finalized."
@@ -133,6 +133,8 @@ export function getStageInfo(
         !!initiative.deployStartDate &&
         !!initiative.pilotStartDate &&
         !!initiative.gaDate;
+      const isBuyPath = initiative.path === 'buy';
+      const vendorNamed = !!initiative.primaryVendor.trim();
       const tasks: LifecycleTask[] = [
         { label: 'CARET panel scored', isComplete: isScored(initiative) },
         { label: 'Initiative Owner named', isComplete: ownerNamed(initiative) },
@@ -144,8 +146,16 @@ export function getStageInfo(
           label: 'Path decided (Build vs. Buy)',
           isComplete: pathChosen(initiative),
         },
+        ...(isBuyPath
+          ? [
+              {
+                label: 'Primary vendor named',
+                isComplete: vendorNamed,
+              } as LifecycleTask,
+            ]
+          : []),
         {
-          label: 'Placed on roadmap calendar (Deploy / Pilot / GA dates set)',
+          label: 'Placed on calendar (Deploy / Pilot / GA dates set)',
           isComplete: timelineSet,
         },
         {
@@ -166,8 +176,8 @@ export function getStageInfo(
         isPast,
         isCurrent,
         isFuture,
-        headline: 'Stage 2: Roadmap',
-        body: 'Sequence the initiative on a calendar with cognitive-load constraints, prepare the PRD, and get conditional executive sign-off on the Accountability Compact before advancing to Deploy.',
+        headline: 'Stage 2: Calendar',
+        body: 'Place the initiative on a calendar with cognitive-load constraints, prepare the PRD, and get conditional executive sign-off on the Accountability Compact before advancing to Deploy.',
         tasks,
         offlineNote: isCurrent
           ? 'The roadmap calendar and PRD builder are coming in future phases. Use the framework markdown to guide offline work; advance the stage once the PRD is approved.'

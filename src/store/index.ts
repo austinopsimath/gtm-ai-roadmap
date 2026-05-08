@@ -28,6 +28,7 @@ type LegacyInitiativeV1 = Omit<
   | 'scoredBy'
   | 'panelists'
   | 'deployStartDate'
+  | 'primaryVendor'
 > & {
   audiencesServed?: string | string[];
   technologies?: string | string[];
@@ -37,6 +38,7 @@ type LegacyInitiativeV1 = Omit<
   scoredBy?: string;
   panelists?: Initiative['panelists'];
   deployStartDate?: string | null;
+  primaryVendor?: string;
 };
 
 const splitLegacyString = (raw: string | string[] | undefined): string[] => {
@@ -78,10 +80,11 @@ const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => {
     scoredAt: raw.scoredAt ?? null,
     scoredBy: raw.scoredBy ?? '',
     deployStartDate: raw.deployStartDate ?? null,
+    primaryVendor: raw.primaryVendor ?? '',
   };
 };
 
-const STORE_VERSION = 5;
+const STORE_VERSION = 6;
 
 export const useRoadmapStore = create<RoadmapState>()(
   persist(

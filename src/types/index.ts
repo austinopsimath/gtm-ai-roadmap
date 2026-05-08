@@ -45,6 +45,7 @@ export interface Initiative {
   initiativeOwner: string;
   executiveSponsor: string;
   path: Path | null;
+  primaryVendor: string;
   audiencesServed: string[];
   technologies: string[];
   systemsTouched: string[];
@@ -122,7 +123,7 @@ export const factorDivergence = (
 
 export const STAGE_LABELS: Record<Stage, string> = {
   prioritize: 'Prioritize',
-  roadmap: 'Roadmap',
+  roadmap: 'Calendar',
   deploy: 'Deploy',
   pilot: 'Pilot',
   ga: 'GA',
@@ -172,6 +173,7 @@ export const createInitiative = (
     initiativeOwner: partial.initiativeOwner ?? '',
     executiveSponsor: partial.executiveSponsor ?? '',
     path: partial.path ?? null,
+    primaryVendor: partial.primaryVendor ?? '',
     audiencesServed: partial.audiencesServed ?? [],
     technologies: partial.technologies ?? [],
     systemsTouched: partial.systemsTouched ?? [],

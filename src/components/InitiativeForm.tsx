@@ -34,6 +34,7 @@ export interface InitiativeFormValues {
   initiativeOwner: string;
   executiveSponsor: string;
   path: Path | null;
+  primaryVendor: string;
   audiencesServed: string[];
   technologies: string[];
   systemsTouched: string[];
@@ -67,6 +68,7 @@ export default function InitiativeForm({
     initiativeOwner: initial?.initiativeOwner ?? '',
     executiveSponsor: initial?.executiveSponsor ?? '',
     path: initial?.path ?? null,
+    primaryVendor: initial?.primaryVendor ?? '',
     audiencesServed: initial?.audiencesServed ?? [],
     technologies: initial?.technologies ?? [],
     systemsTouched: initial?.systemsTouched ?? [],
@@ -184,7 +186,10 @@ export default function InitiativeForm({
                   type="radio"
                   name="path"
                   checked={values.path === p}
-                  onChange={() => setField('path', p)}
+                  onChange={() => {
+                    setField('path', p);
+                    if (p !== 'buy') setField('primaryVendor', '');
+                  }}
                 />
                 {PATH_LABELS[p]}
               </label>
@@ -194,12 +199,27 @@ export default function InitiativeForm({
                 type="radio"
                 name="path"
                 checked={values.path === null}
-                onChange={() => setField('path', null)}
+                onChange={() => {
+                  setField('path', null);
+                  setField('primaryVendor', '');
+                }}
               />
               Not yet decided
             </label>
           </div>
         </Field>
+        {values.path === 'buy' && (
+          <Combobox
+            mode="single"
+            label="Primary vendor"
+            options={technologyOptions}
+            selected={values.primaryVendor}
+            onChange={(v) => setField('primaryVendor', v)}
+            onCreateOption={(v) => addCustomOption('technologies', v)}
+            placeholder="Select or add a vendor..."
+            help="The single primary vendor this initiative depends on. Full evaluation list lives in the PRD."
+          />
+        )}
         <Combobox
           mode="multi"
           label="Audiences served"

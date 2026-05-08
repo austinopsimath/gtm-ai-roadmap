@@ -1,10 +1,16 @@
-import { useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import {
+  Link,
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useRoadmapStore } from '../store';
 import {
   HEALTH_LABELS,
   PATH_LABELS,
   STAGE_LABELS,
+  STAGE_ORDER,
   calculatePriorityScore,
   type Initiative,
   type Stage,
@@ -17,15 +23,29 @@ import LifecycleSection from '../components/LifecycleSection';
 export default function InitiativeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initiative = useRoadmapStore((s) =>
     s.initiatives.find((i) => i.id === id),
   );
   const deleteInitiative = useRoadmapStore((s) => s.deleteInitiative);
-  const [viewedStage, setViewedStage] = useState<Stage | null>(null);
 
   if (!initiative) return <Navigate to="/" replace />;
 
-  const effectiveViewedStage = viewedStage ?? initiative.stage;
+  const stageParam = searchParams.get('stage') as Stage | null;
+  const isValidStage =
+    stageParam && STAGE_ORDER.includes(stageParam) && stageParam !== 'killed' && stageParam !== 'wound_down';
+  const effectiveViewedStage: Stage = isValidStage
+    ? stageParam
+    : initiative.stage;
+
+  const setViewedStage = (stage: Stage) => {
+    if (stage === initiative.stage) {
+      // Default state — drop the query param to keep the URL clean
+      setSearchParams({});
+    } else {
+      setSearchParams({ stage });
+    }
+  };
   const priorityScore = calculatePriorityScore(initiative.caret);
   const isScored = priorityScore !== null;
 
@@ -124,6 +144,12 @@ function ProfileSection({ initiative }: { initiative: Initiative }) {
             label="Path"
             value={initiative.path ? PATH_LABELS[initiative.path] : null}
           />
+          {initiative.path === 'buy' && (
+            <Detail
+              label="Primary vendor"
+              value={initiative.primaryVendor || null}
+            />
+          )}
         </Card>
 
         <Card title="Scope">

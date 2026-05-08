@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useRoadmapStore } from '../store';
 import { STAGE_LABELS, STAGE_ORDER, type Stage } from '../types';
 import {
@@ -21,6 +21,12 @@ type StageFilter = 'all' | 'in-flight' | Stage;
 
 export default function Roadmap() {
   const initiatives = useRoadmapStore((s) => s.initiatives);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromId = searchParams.get('from');
+  const fromInitiative = fromId
+    ? initiatives.find((i) => i.id === fromId)
+    : null;
   const [stageFilter, setStageFilter] = useState<StageFilter>('in-flight');
 
   const filtered = useMemo(
@@ -32,6 +38,18 @@ export default function Roadmap() {
     () => filtered.map(toScheduled).filter((s): s is ScheduledInitiative => !!s),
     [filtered],
   );
+
+  useEffect(() => {
+    if (!fromId) return;
+    const el = document.getElementById(`gantt-row-${fromId}`);
+    if (el) {
+      el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+    }
+  }, [fromId, scheduled.length]);
 
   const range = useMemo(() => computeTimeRange(scheduled), [scheduled]);
   const months = useMemo(() => buildMonthTicks(range), [range]);
@@ -50,6 +68,22 @@ export default function Roadmap() {
 
   return (
     <div>
+      <div className="mb-2 flex items-center gap-3">
+        {fromInitiative ? (
+          <button
+            onClick={() =>
+              navigate(`/initiatives/${fromInitiative.id}?stage=roadmap`)
+            }
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            ← Back to {fromInitiative.name}
+          </button>
+        ) : (
+          <Link to="/" className="text-sm text-gray-500 hover:text-gray-700">
+            ← Registry
+          </Link>
+        )}
+      </div>
       <header className="mb-6 flex items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
@@ -89,7 +123,12 @@ export default function Roadmap() {
             <div style={{ minWidth: '900px' }}>
               <TimelineHeader months={months} />
               {scheduled.map((s) => (
-                <GanttRow key={s.initiative.id} scheduled={s} range={range} />
+                <GanttRow
+                  key={s.initiative.id}
+                  scheduled={s}
+                  range={range}
+                  highlighted={s.initiative.id === fromId}
+                />
               ))}
               <CognitiveLoadLane
                 loadTicks={loadTicks}
@@ -159,9 +198,11 @@ function TimelineHeader({
 function GanttRow({
   scheduled,
   range,
+  highlighted,
 }: {
   scheduled: ScheduledInitiative;
   range: TimeRange;
+  highlighted: boolean;
 }) {
   const navigate = useNavigate();
   const i = scheduled.initiative;
@@ -173,8 +214,13 @@ function GanttRow({
 
   return (
     <div
-      className="grid cursor-pointer grid-cols-[240px_1fr] border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
-      onClick={() => navigate(`/initiatives/${i.id}`)}
+      id={`gantt-row-${i.id}`}
+      className={`grid cursor-pointer grid-cols-[240px_1fr] border-b border-gray-100 last:border-b-0 ${
+        highlighted
+          ? 'bg-blue-50 ring-2 ring-blue-300 ring-inset'
+          : 'hover:bg-gray-50'
+      }`}
+      onClick={() => navigate(`/initiatives/${i.id}?stage=roadmap`)}
     >
       <div className="px-3 py-3">
         <div className="line-clamp-1 text-sm font-medium text-gray-900">
