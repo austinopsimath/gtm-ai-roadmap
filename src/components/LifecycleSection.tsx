@@ -251,48 +251,57 @@ function StagePanel({
 
 function TaskRow({ task }: { task: LifecycleTask }) {
   return (
-    <li className="flex items-start gap-2 text-sm">
-      <span
-        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded ${
-          task.isComplete
-            ? 'bg-emerald-500 text-white'
-            : 'border border-gray-300 bg-white text-gray-400'
-        }`}
-      >
-        {task.isComplete && (
-          <svg
-            className="h-3 w-3"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden
-          >
-            <path
-              fillRule="evenodd"
-              d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 011.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
-              clipRule="evenodd"
-            />
-          </svg>
-        )}
-      </span>
-      <div className="flex-1">
+    <li>
+      <div className="flex items-start gap-2 text-sm">
         <span
-          className={
+          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded ${
             task.isComplete
-              ? 'text-gray-700 line-through decoration-gray-300'
-              : 'text-gray-700'
-          }
+              ? 'bg-emerald-500 text-white'
+              : 'border border-gray-300 bg-white text-gray-400'
+          }`}
         >
-          {task.label}
+          {task.isComplete && (
+            <svg
+              className="h-3 w-3"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 011.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          )}
         </span>
-        {task.comingSoon && (
-          <span className="ml-2 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gray-600">
-            Coming soon
+        <div className="flex-1">
+          <span
+            className={
+              task.isComplete
+                ? 'text-gray-700 line-through decoration-gray-300'
+                : 'text-gray-700'
+            }
+          >
+            {task.label}
           </span>
-        )}
-        {task.hint && !task.comingSoon && (
-          <span className="ml-2 text-xs text-gray-500">{task.hint}</span>
-        )}
+          {task.comingSoon && (
+            <span className="ml-2 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gray-600">
+              Coming soon
+            </span>
+          )}
+          {task.hint && !task.comingSoon && (
+            <span className="ml-2 text-xs text-gray-500">{task.hint}</span>
+          )}
+        </div>
       </div>
+      {task.subTasks && task.subTasks.length > 0 && (
+        <ul className="ml-6 mt-2 space-y-1.5 border-l border-gray-200 pl-4">
+          {task.subTasks.map((sub, idx) => (
+            <TaskRow key={idx} task={sub} />
+          ))}
+        </ul>
+      )}
     </li>
   );
 }

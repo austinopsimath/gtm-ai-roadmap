@@ -14,6 +14,7 @@ export interface LifecycleTask {
   isComplete: boolean;
   comingSoon?: boolean;
   hint?: string;
+  subTasks?: LifecycleTask[];
 }
 
 export interface StageInfo {
@@ -132,34 +133,105 @@ export function getStageInfo(
     case 'prd': {
       const isBuyPath = initiative.path === 'buy';
       const vendorNamed = !!initiative.primaryVendor.trim();
+      const summarySectionDone =
+        !!initiative.name.trim() &&
+        !!initiative.description.trim() &&
+        ownerNamed(initiative) &&
+        sponsorNamed(initiative);
+      const targetUsersSectionDone = initiative.audiencesServed.length > 0;
+      const businessNeedSectionDone = isScored(initiative);
+      const pathSectionDone =
+        pathChosen(initiative) && (!isBuyPath || vendorNamed);
+      const systemsSectionDone = initiative.systemsTouched.length > 0;
+
+      const prdSections: LifecycleTask[] = [
+        {
+          label: 'Section 1: Initiative Summary',
+          isComplete: summarySectionDone,
+          hint: !summarySectionDone
+            ? 'Needs name, description, owner, and sponsor — captured on the initiative profile.'
+            : undefined,
+        },
+        {
+          label: 'Section 2: Target Users',
+          isComplete: targetUsersSectionDone,
+          hint: !targetUsersSectionDone
+            ? 'Set Audiences served on the initiative profile.'
+            : undefined,
+        },
+        {
+          label: 'Section 3: Business Need + CARET Context',
+          isComplete: businessNeedSectionDone,
+          hint: !businessNeedSectionDone
+            ? 'Complete CARET scoring in Stage 1.'
+            : undefined,
+        },
+        {
+          label: 'Section 4: Success Metrics — All Three Layers',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 5: Path (Build vs. Buy)',
+          isComplete: pathSectionDone,
+          hint: !pathSectionDone
+            ? isBuyPath
+              ? 'Buy path needs a primary vendor named below.'
+              : 'Decide Build vs. Buy below.'
+            : undefined,
+        },
+        {
+          label: 'Section 6: Systems and Integrations',
+          isComplete: systemsSectionDone,
+          hint: !systemsSectionDone
+            ? 'Set Systems Touched on the initiative profile.'
+            : undefined,
+        },
+        {
+          label: 'Section 7: Data Architecture',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 8: Risk Assessment',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 9: Pilot Plan',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 10: Workstream Assignments',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 11: Measurement Cadence',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 12: Approval Mechanism',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Section 13: Conditional Accountability Compact',
+          isComplete: false,
+          comingSoon: true,
+        },
+      ];
+
+      const sectionsComplete = prdSections.filter((s) => s.isComplete).length;
+      const allSectionsDone = sectionsComplete === prdSections.length;
+
       const tasks: LifecycleTask[] = [
-        { label: 'CARET panel scored', isComplete: isScored(initiative) },
-        { label: 'Initiative Owner named', isComplete: ownerNamed(initiative) },
         {
-          label: 'Executive Sponsor named',
-          isComplete: sponsorNamed(initiative),
-        },
-        {
-          label: 'Path decided (Build vs. Buy)',
-          isComplete: pathChosen(initiative),
-        },
-        ...(isBuyPath
-          ? [
-              {
-                label: 'Primary vendor named',
-                isComplete: vendorNamed,
-              } as LifecycleTask,
-            ]
-          : []),
-        {
-          label: 'PRD sections drafted (1–12)',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Conditional Accountability Compact captured (Section 13)',
-          isComplete: false,
-          comingSoon: true,
+          label: `Complete the PRD (${sectionsComplete} of ${prdSections.length} sections)`,
+          isComplete: allSectionsDone,
+          subTasks: prdSections,
         },
         {
           label: 'Scoring panel approved the PRD',
@@ -185,10 +257,10 @@ export function getStageInfo(
         isCurrent,
         isFuture,
         headline: 'Stage 2: PRD',
-        body: 'Write the 13-section PRD — the framework\'s gate artifact that documents path, vendor, success metrics, pilot plan, and the conditional Accountability Compact (Section 13). Once the panel approves and the conditional Compact is signed, the initiative is ready to be placed on the calendar.',
+        body: "The PRD — Product Requirements Document — is the framework's 13-section gate artifact. Written by the Initiative Owner, approved by the scoring panel, and conditionally signed by the executive sponsor (via Section 13, the Accountability Compact). A completed, approved PRD is what certifies an initiative is ready to be placed on the calendar and resourced for Deploy.",
         tasks,
         offlineNote: isCurrent
-          ? 'The PRD builder is coming in a future phase. For now, write the PRD offline using the framework markdown and advance once it\'s approved with the conditional Compact signed.'
+          ? "The full PRD builder is coming in a future phase. For now, write Sections 4 and 7–13 offline using the framework markdown; Sections 1–3, 5, and 6 auto-check from the initiative profile and CARET scoring as you fill them in."
           : undefined,
         primaryAction: isCurrent
           ? {
