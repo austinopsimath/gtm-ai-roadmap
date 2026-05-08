@@ -28,9 +28,9 @@ export interface Initiative {
   initiativeOwner: string;
   executiveSponsor: string;
   path: Path | null;
-  audiencesServed: string;
-  technologies: string;
-  systemsTouched: string;
+  audiencesServed: string[];
+  technologies: string[];
+  systemsTouched: string[];
   caret: CARETScores;
   level3Metric: string;
   intakeDate: string | null;
@@ -78,6 +78,8 @@ export const calculatePriorityScore = (caret: CARETScores): number | null => {
   return ((a * r) / (c * e)) * t;
 };
 
+export const todayISO = (): string => new Date().toISOString().slice(0, 10);
+
 export const createInitiative = (
   partial: Partial<Initiative> & { name: string },
 ): Initiative => {
@@ -91,12 +93,12 @@ export const createInitiative = (
     initiativeOwner: partial.initiativeOwner ?? '',
     executiveSponsor: partial.executiveSponsor ?? '',
     path: partial.path ?? null,
-    audiencesServed: partial.audiencesServed ?? '',
-    technologies: partial.technologies ?? '',
-    systemsTouched: partial.systemsTouched ?? '',
+    audiencesServed: partial.audiencesServed ?? [],
+    technologies: partial.technologies ?? [],
+    systemsTouched: partial.systemsTouched ?? [],
     caret: partial.caret ?? { c: 0, a: 0, r: 0, e: 0, t: 0 },
     level3Metric: partial.level3Metric ?? '',
-    intakeDate: partial.intakeDate ?? now.slice(0, 10),
+    intakeDate: partial.intakeDate ?? todayISO(),
     pilotStartDate: partial.pilotStartDate ?? null,
     gaDate: partial.gaDate ?? null,
     lastReviewedDate: partial.lastReviewedDate ?? null,

@@ -4,12 +4,20 @@ import {
   PATH_LABELS,
   STAGE_LABELS,
   STAGE_ORDER,
-  calculatePriorityScore,
+  todayISO,
   type Health,
   type Initiative,
   type Path,
   type Stage,
 } from '../types';
+import { useRoadmapStore } from '../store';
+import {
+  DEFAULT_AUDIENCES,
+  DEFAULT_LEVEL3_METRICS,
+  DEFAULT_SYSTEMS,
+  DEFAULT_TECHNOLOGIES,
+} from '../constants/picklists';
+import Combobox from './Combobox';
 
 interface Props {
   initial?: Partial<Initiative>;
@@ -26,10 +34,9 @@ export interface InitiativeFormValues {
   initiativeOwner: string;
   executiveSponsor: string;
   path: Path | null;
-  audiencesServed: string;
-  technologies: string;
-  systemsTouched: string;
-  caret: { c: number; a: number; r: number; e: number; t: number };
+  audiencesServed: string[];
+  technologies: string[];
+  systemsTouched: string[];
   level3Metric: string;
   intakeDate: string | null;
   pilotStartDate: string | null;
@@ -37,12 +44,20 @@ export interface InitiativeFormValues {
   lastReviewedDate: string | null;
 }
 
+const dedupe = (arr: string[]): string[] => Array.from(new Set(arr));
+
 export default function InitiativeForm({
   initial,
   submitLabel,
   onSubmit,
   onCancel,
 }: Props) {
+  const customAudiences = useRoadmapStore((s) => s.customAudiences);
+  const customTechnologies = useRoadmapStore((s) => s.customTechnologies);
+  const customSystems = useRoadmapStore((s) => s.customSystems);
+  const customLevel3Metrics = useRoadmapStore((s) => s.customLevel3Metrics);
+  const addCustomOption = useRoadmapStore((s) => s.addCustomOption);
+
   const [values, setValues] = useState<InitiativeFormValues>({
     name: initial?.name ?? '',
     description: initial?.description ?? '',
@@ -51,18 +66,26 @@ export default function InitiativeForm({
     initiativeOwner: initial?.initiativeOwner ?? '',
     executiveSponsor: initial?.executiveSponsor ?? '',
     path: initial?.path ?? null,
-    audiencesServed: initial?.audiencesServed ?? '',
-    technologies: initial?.technologies ?? '',
-    systemsTouched: initial?.systemsTouched ?? '',
-    caret: initial?.caret ?? { c: 0, a: 0, r: 0, e: 0, t: 0 },
+    audiencesServed: initial?.audiencesServed ?? [],
+    technologies: initial?.technologies ?? [],
+    systemsTouched: initial?.systemsTouched ?? [],
     level3Metric: initial?.level3Metric ?? '',
-    intakeDate: initial?.intakeDate ?? null,
+    intakeDate: initial?.intakeDate ?? todayISO(),
     pilotStartDate: initial?.pilotStartDate ?? null,
     gaDate: initial?.gaDate ?? null,
     lastReviewedDate: initial?.lastReviewedDate ?? null,
   });
 
-  const priorityScore = calculatePriorityScore(values.caret);
+  const audienceOptions = dedupe([...DEFAULT_AUDIENCES, ...customAudiences]);
+  const technologyOptions = dedupe([
+    ...DEFAULT_TECHNOLOGIES,
+    ...customTechnologies,
+  ]);
+  const systemOptions = dedupe([...DEFAULT_SYSTEMS, ...customSystems]);
+  const level3Options = dedupe([
+    ...DEFAULT_LEVEL3_METRICS,
+    ...customLevel3Metrics,
+  ]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -74,9 +97,6 @@ export default function InitiativeForm({
     key: K,
     value: InitiativeFormValues[K],
   ) => setValues((prev) => ({ ...prev, [key]: value }));
-
-  const setCARET = (key: keyof InitiativeFormValues['caret'], value: number) =>
-    setValues((prev) => ({ ...prev, caret: { ...prev.caret, [key]: value } }));
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -178,88 +198,46 @@ export default function InitiativeForm({
             </label>
           </div>
         </Field>
-        <Field
+        <Combobox
+          mode="multi"
           label="Audiences served"
-          help="Specific roles and segments — e.g., 'Enterprise AEs, EMEA' or 'All SDRs'"
-        >
-          <input
-            type="text"
-            value={values.audiencesServed}
-            onChange={(e) => setField('audiencesServed', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <Field
+          options={audienceOptions}
+          selected={values.audiencesServed}
+          onChange={(v) => setField('audiencesServed', v)}
+          onCreateOption={(v) => addCustomOption('audiences', v)}
+          help="Specific roles and segments. Pick all that apply, or add your own."
+          placeholder="Select audiences..."
+        />
+        <Combobox
+          mode="multi"
           label="Technologies / Vendors"
-          help="e.g., Gong, custom RAG on Snowflake, Clari"
-        >
-          <input
-            type="text"
-            value={values.technologies}
-            onChange={(e) => setField('technologies', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <Field
+          options={technologyOptions}
+          selected={values.technologies}
+          onChange={(v) => setField('technologies', v)}
+          onCreateOption={(v) => addCustomOption('technologies', v)}
+          help="Tools used to build or power this initiative — LLM platforms, vendor products, integration platforms."
+          placeholder="Select technologies..."
+        />
+        <Combobox
+          mode="multi"
           label="Systems touched"
-          help="Every system this initiative reads from, writes to, or sits alongside"
-        >
-          <input
-            type="text"
-            value={values.systemsTouched}
-            onChange={(e) => setField('systemsTouched', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <Field
+          options={systemOptions}
+          selected={values.systemsTouched}
+          onChange={(v) => setField('systemsTouched', v)}
+          onCreateOption={(v) => addCustomOption('systems', v)}
+          help="Where this initiative lives in ongoing operations — the CRM, SEP, conversation intelligence, communication, and data systems involved when reps actually use it."
+          placeholder="Select systems..."
+        />
+        <Combobox
+          mode="single"
           label="Level 3 metric targeted"
-          help="The executive-level outcome — e.g., 'win rate', 'NRR', 'attainment'"
-        >
-          <input
-            type="text"
-            value={values.level3Metric}
-            onChange={(e) => setField('level3Metric', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-      </Section>
-
-      <Section
-        title="CARET scoring"
-        subtitle="Each factor 1–5 (T is 1.0–1.5). Leave at 0 to score later. Phase 2 will replace this with a guided wizard."
-      >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
-          {(
-            [
-              { key: 'c', label: 'C — Complexity', min: 0, max: 5, step: 1 },
-              { key: 'a', label: 'A — Alignment', min: 0, max: 5, step: 1 },
-              { key: 'r', label: 'R — Results', min: 0, max: 5, step: 1 },
-              { key: 'e', label: 'E — Effort', min: 0, max: 5, step: 1 },
-              { key: 't', label: 'T — Timeline', min: 0, max: 1.5, step: 0.1 },
-            ] as const
-          ).map(({ key, label, min, max, step }) => (
-            <Field key={key} label={label}>
-              <input
-                type="number"
-                min={min}
-                max={max}
-                step={step}
-                value={values.caret[key]}
-                onChange={(e) =>
-                  setCARET(key, parseFloat(e.target.value) || 0)
-                }
-                className={inputClass}
-              />
-            </Field>
-          ))}
-        </div>
-        <div className="mt-2 rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
-          Priority score:{' '}
-          <span className="font-semibold text-gray-900">
-            {priorityScore === null ? '—' : priorityScore.toFixed(2)}
-          </span>{' '}
-          <span className="text-gray-400">{'( (A × R) / (C × E) × T )'}</span>
-        </div>
+          options={level3Options}
+          selected={values.level3Metric}
+          onChange={(v) => setField('level3Metric', v)}
+          onCreateOption={(v) => addCustomOption('level3Metrics', v)}
+          help="The single executive-level outcome this initiative was funded to move."
+          placeholder="Select a metric..."
+        />
       </Section>
 
       <Section title="Key dates">
@@ -354,12 +332,10 @@ function Section({
 
 function Field({
   label,
-  help,
   required,
   children,
 }: {
   label: string;
-  help?: string;
   required?: boolean;
   children: React.ReactNode;
 }) {
@@ -370,7 +346,6 @@ function Field({
         {required && <span className="ml-0.5 text-red-500">*</span>}
       </label>
       {children}
-      {help && <p className="text-xs text-gray-500">{help}</p>}
     </div>
   );
 }

@@ -31,14 +31,12 @@ export default function InitiativeDetail() {
   };
 
   const priorityScore = calculatePriorityScore(initiative.caret);
+  const isScored = priorityScore !== null;
 
   return (
     <div>
       <div className="mb-2">
-        <Link
-          to="/"
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
+        <Link to="/" className="text-sm text-gray-500 hover:text-gray-700">
           ← Registry
         </Link>
       </div>
@@ -91,60 +89,61 @@ export default function InitiativeDetail() {
           <Detail label="Health" value={HEALTH_LABELS[initiative.health]} />
           <Detail
             label="Priority Score"
-            value={
-              priorityScore === null ? null : priorityScore.toFixed(2)
-            }
+            value={isScored ? priorityScore!.toFixed(2) : null}
+            placeholder="Not yet scored"
           />
         </Card>
 
         <Card title="Scope">
-          <Detail
+          <ChipsDetail
             label="Audiences served"
-            value={initiative.audiencesServed}
+            values={initiative.audiencesServed}
           />
-          <Detail
+          <ChipsDetail
             label="Technologies / Vendors"
-            value={initiative.technologies}
+            values={initiative.technologies}
           />
-          <Detail
+          <ChipsDetail
             label="Systems touched"
-            value={initiative.systemsTouched}
+            values={initiative.systemsTouched}
           />
-          <Detail
-            label="Level 3 metric"
-            value={initiative.level3Metric}
-          />
+          <Detail label="Level 3 metric" value={initiative.level3Metric} />
         </Card>
 
         <Card title="CARET scores">
-          <div className="grid grid-cols-5 gap-2 text-center">
-            {(
-              [
-                ['C', initiative.caret.c],
-                ['A', initiative.caret.a],
-                ['R', initiative.caret.r],
-                ['E', initiative.caret.e],
-                ['T', initiative.caret.t],
-              ] as const
-            ).map(([label, value]) => (
-              <div key={label} className="rounded-md bg-gray-50 px-2 py-3">
-                <div className="text-xs text-gray-500">{label}</div>
-                <div className="text-lg font-semibold text-gray-900">
-                  {value || '—'}
+          {isScored ? (
+            <div className="grid grid-cols-5 gap-2 text-center">
+              {(
+                [
+                  ['C', initiative.caret.c],
+                  ['A', initiative.caret.a],
+                  ['R', initiative.caret.r],
+                  ['E', initiative.caret.e],
+                  ['T', initiative.caret.t],
+                ] as const
+              ).map(([label, value]) => (
+                <div key={label} className="rounded-md bg-gray-50 px-2 py-3">
+                  <div className="text-xs text-gray-500">{label}</div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {value}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Not yet scored. Phase 2 will add a guided scoring flow with the
+              full CARET methodology, multi-scorer support, and divergence
+              resolution.
+            </p>
+          )}
         </Card>
 
         <Card title="Key dates">
           <Detail label="Intake" value={initiative.intakeDate} />
           <Detail label="Pilot start" value={initiative.pilotStartDate} />
           <Detail label="GA" value={initiative.gaDate} />
-          <Detail
-            label="Last reviewed"
-            value={initiative.lastReviewedDate}
-          />
+          <Detail label="Last reviewed" value={initiative.lastReviewedDate} />
         </Card>
 
         <Card title="Record">
@@ -160,9 +159,9 @@ export default function InitiativeDetail() {
       </div>
 
       <div className="mt-8 rounded-md border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500">
-        Phase 1 detail view. Subsequent phases will add: gate checklist sidebar,
-        PRD builder, Accountability Compact, GA tracking, and roadmap
-        positioning.
+        Phase 1 detail view. Subsequent phases will add: CARET scoring wizard,
+        gate checklist sidebar, PRD builder, Accountability Compact, GA tracking,
+        and roadmap positioning.
       </div>
     </div>
   );
@@ -188,16 +187,44 @@ function Card({
 function Detail({
   label,
   value,
+  placeholder,
 }: {
   label: string;
   value: string | null | undefined;
+  placeholder?: string;
 }) {
   return (
     <div>
       <div className="text-xs text-gray-500">{label}</div>
       <div className="text-sm text-gray-900">
-        {value ? value : <span className="text-gray-400">—</span>}
+        {value ? (
+          value
+        ) : (
+          <span className="text-gray-400">{placeholder ?? '—'}</span>
+        )}
       </div>
+    </div>
+  );
+}
+
+function ChipsDetail({ label, values }: { label: string; values: string[] }) {
+  return (
+    <div>
+      <div className="text-xs text-gray-500">{label}</div>
+      {values.length === 0 ? (
+        <div className="text-sm text-gray-400">—</div>
+      ) : (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {values.map((v) => (
+            <span
+              key={v}
+              className="inline-flex rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-800"
+            >
+              {v}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
