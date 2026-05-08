@@ -41,8 +41,82 @@ export interface Initiative {
   updatedAt: string;
 }
 
-export const calculatePriorityScore = (caret: CARETScores): number => {
+export const STAGE_LABELS: Record<Stage, string> = {
+  prioritize: 'Prioritize',
+  roadmap: 'Roadmap',
+  deploy: 'Deploy',
+  pilot: 'Pilot',
+  ga: 'GA',
+  killed: 'Killed',
+  wound_down: 'Wound Down',
+};
+
+export const STAGE_ORDER: Stage[] = [
+  'prioritize',
+  'roadmap',
+  'deploy',
+  'pilot',
+  'ga',
+  'killed',
+  'wound_down',
+];
+
+export const HEALTH_LABELS: Record<Health, string> = {
+  green: 'Green',
+  yellow: 'Yellow',
+  red: 'Red',
+};
+
+export const PATH_LABELS: Record<Path, string> = {
+  build: 'Build',
+  buy: 'Buy',
+};
+
+export const calculatePriorityScore = (caret: CARETScores): number | null => {
   const { c, a, r, e, t } = caret;
-  if (c === 0 || e === 0) return 0;
+  if (!c || !a || !r || !e || !t) return null;
   return ((a * r) / (c * e)) * t;
+};
+
+export const createInitiative = (
+  partial: Partial<Initiative> & { name: string },
+): Initiative => {
+  const now = new Date().toISOString();
+  return {
+    id: crypto.randomUUID(),
+    name: partial.name,
+    description: partial.description ?? '',
+    stage: partial.stage ?? 'prioritize',
+    health: partial.health ?? 'green',
+    initiativeOwner: partial.initiativeOwner ?? '',
+    executiveSponsor: partial.executiveSponsor ?? '',
+    path: partial.path ?? null,
+    audiencesServed: partial.audiencesServed ?? '',
+    technologies: partial.technologies ?? '',
+    systemsTouched: partial.systemsTouched ?? '',
+    caret: partial.caret ?? { c: 0, a: 0, r: 0, e: 0, t: 0 },
+    level3Metric: partial.level3Metric ?? '',
+    intakeDate: partial.intakeDate ?? now.slice(0, 10),
+    pilotStartDate: partial.pilotStartDate ?? null,
+    gaDate: partial.gaDate ?? null,
+    lastReviewedDate: partial.lastReviewedDate ?? null,
+    createdAt: partial.createdAt ?? now,
+    updatedAt: now,
+  };
+};
+
+export interface BackupFile {
+  version: 1;
+  exportedAt: string;
+  initiatives: Initiative[];
+}
+
+export const isBackupFile = (data: unknown): data is BackupFile => {
+  if (typeof data !== 'object' || data === null) return false;
+  const d = data as Record<string, unknown>;
+  return (
+    d.version === 1 &&
+    typeof d.exportedAt === 'string' &&
+    Array.isArray(d.initiatives)
+  );
 };

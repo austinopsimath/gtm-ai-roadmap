@@ -1,12 +1,20 @@
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import AppLayout from './components/AppLayout';
 import Dashboard from './routes/Dashboard';
+import NewInitiative from './routes/NewInitiative';
+import EditInitiative from './routes/EditInitiative';
+import InitiativeDetail from './routes/InitiativeDetail';
 
 export default function App() {
   return (
-    <div className="min-h-full bg-gray-50 text-gray-900">
-      <Routes>
+    <Routes>
+      <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
-      </Routes>
-    </div>
+        <Route path="/initiatives/new" element={<NewInitiative />} />
+        <Route path="/initiatives/:id" element={<InitiativeDetail />} />
+        <Route path="/initiatives/:id/edit" element={<EditInitiative />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   );
 }
