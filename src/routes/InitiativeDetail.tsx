@@ -6,6 +6,7 @@ import {
   STAGE_LABELS,
   calculatePriorityScore,
   factorDivergence,
+  isNA,
 } from '../types';
 import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import { formatRelativeTime } from '../lib/time';
@@ -204,9 +205,11 @@ export default function InitiativeDetail() {
                           {FACTOR_ORDER.map((f) => (
                             <span key={f} className="ml-1.5">
                               {FACTORS[f].letter}:{' '}
-                              {p.scores[f] > 0
-                                ? formatNumber(p.scores[f])
-                                : '—'}
+                              {isNA(p.scores[f])
+                                ? 'N/A'
+                                : p.scores[f] > 0
+                                  ? formatNumber(p.scores[f])
+                                  : '—'}
                             </span>
                           ))}
                         </div>

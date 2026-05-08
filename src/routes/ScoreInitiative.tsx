@@ -7,6 +7,8 @@ import {
   computeFactorAverage,
   createPanelist,
   factorDivergence,
+  isNA,
+  NA_SCORE,
   type CARETFactor,
   type CARETNotes,
   type Panelist,
@@ -298,6 +300,21 @@ function IntroStep({
         </p>
       </div>
 
+      <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+        <strong className="font-semibold">
+          Before you start: canvass the panel.
+        </strong>{' '}
+        This wizard captures the consensus output of a panel ceremony — it
+        doesn't run the panel for you. As initiative owner, gather scores from
+        each stakeholder beforehand. Live in a meeting is best — you'll see
+        divergence in real time and can capture the discussion. Asynchronous
+        is fine too. Tell each panelist to skip any factor outside their
+        domain (an AE leader probably can't usefully score Complexity); use
+        the <strong className="font-semibold">N/A</strong> button on each
+        factor page to mark a panelist as not having scored — it's excluded
+        from the average without dragging the score down.
+      </div>
+
       <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
         {FACTOR_ORDER.map((f) => (
           <div
@@ -546,6 +563,15 @@ function PanelistScoreRow({
   onChange: (v: number) => void;
 }) {
   const f = FACTORS[factor];
+  const naSelected = isNA(value);
+  const handleClick = (newValue: number) => {
+    // Clicking the currently-selected button toggles it off.
+    if (newValue === value) {
+      onChange(0);
+    } else {
+      onChange(newValue);
+    }
+  };
   return (
     <div className="rounded-md border border-gray-200 bg-white px-3 py-3">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
@@ -560,17 +586,21 @@ function PanelistScoreRow({
           )}
         </div>
         <span className="font-mono text-xs text-gray-500">
-          {value > 0 ? formatScore(value) : 'No score'}
+          {naSelected
+            ? 'N/A — excluded from average'
+            : value > 0
+              ? formatScore(value)
+              : 'No score yet'}
         </span>
       </div>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         {f.scaleLabels.map((s) => {
           const selected = value === s.value;
           return (
             <button
               key={s.value}
               type="button"
-              onClick={() => onChange(s.value)}
+              onClick={() => handleClick(s.value)}
               title={s.long}
               className={`rounded-md border px-3 py-1.5 font-mono text-sm transition ${
                 selected
@@ -582,6 +612,19 @@ function PanelistScoreRow({
             </button>
           );
         })}
+        <span className="mx-1 h-6 w-px bg-gray-200" aria-hidden />
+        <button
+          type="button"
+          onClick={() => handleClick(NA_SCORE)}
+          title="This panelist did not score this factor — typically because it's outside their domain. Excluded from the average."
+          className={`rounded-md border px-3 py-1.5 text-xs font-medium transition ${
+            naSelected
+              ? 'border-gray-900 bg-gray-900 text-white'
+              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+          }`}
+        >
+          N/A
+        </button>
       </div>
     </div>
   );
@@ -649,7 +692,11 @@ function ReviewStep({
                 {FACTOR_ORDER.map((f) => (
                   <span key={f} className="ml-2">
                     {FACTORS[f].letter}:{' '}
-                    {p.scores[f] > 0 ? formatScore(p.scores[f]) : '—'}
+                    {isNA(p.scores[f])
+                      ? 'N/A'
+                      : p.scores[f] > 0
+                        ? formatScore(p.scores[f])
+                        : '—'}
                   </span>
                 ))}
               </div>

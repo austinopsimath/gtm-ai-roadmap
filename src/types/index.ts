@@ -64,6 +64,13 @@ export interface Initiative {
 
 export const FACTOR_KEYS: CARETFactor[] = ['c', 'a', 'r', 'e', 't'];
 
+// Sentinel for explicitly-marked-N/A scores. 0 still means "not yet scored".
+// Both are excluded from averages via the > 0 filter, so the math is unchanged;
+// the sentinel just lets the UI render "N/A" instead of an empty cell.
+export const NA_SCORE = -1;
+
+export const isNA = (score: number): boolean => score === NA_SCORE;
+
 export const emptyScores = (): CARETScores => ({
   c: 0,
   a: 0,
