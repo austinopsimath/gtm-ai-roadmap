@@ -12,6 +12,7 @@ import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import { formatRelativeTime } from '../lib/time';
 import HealthBadge from '../components/HealthBadge';
 import StageBadge from '../components/StageBadge';
+import LifecycleSection from '../components/LifecycleSection';
 
 export default function InitiativeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -75,31 +76,9 @@ export default function InitiativeDetail() {
         </div>
       </header>
 
-      {!isScored && (
-        <section className="mb-6 rounded-lg bg-gray-900 p-8 text-white">
-          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-            <div className="max-w-2xl">
-              <div className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Next step
-              </div>
-              <h2 className="mt-1 text-xl font-semibold">
-                Score this initiative with CARET
-              </h2>
-              <p className="mt-2 text-sm text-gray-300">
-                Capture each stakeholder's score across the five factors. The
-                wizard computes a Priority Score and flags divergence so the
-                panel can resolve it before the score is finalized.
-              </p>
-            </div>
-            <button
-              onClick={() => navigate(`/initiatives/${initiative.id}/score`)}
-              className="shrink-0 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 hover:bg-gray-100"
-            >
-              Begin CARET scoring →
-            </button>
-          </div>
-        </section>
-      )}
+      <div className="mb-6">
+        <LifecycleSection initiative={initiative} />
+      </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card title="Ownership">
@@ -258,7 +237,7 @@ export default function InitiativeDetail() {
             </>
           ) : (
             <div className="text-sm text-gray-500">
-              Use the hero card above to begin the CARET scoring wizard.
+              Use the lifecycle checklist above to begin scoring.
             </div>
           )}
         </Card>
@@ -282,11 +261,6 @@ export default function InitiativeDetail() {
         </Card>
       </div>
 
-      <div className="mt-8 rounded-md border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500">
-        Subsequent phases will add: roadmap positioning with cognitive load,
-        gate checklist sidebar, PRD builder, Accountability Compact, and GA
-        tracking.
-      </div>
     </div>
   );
 }
