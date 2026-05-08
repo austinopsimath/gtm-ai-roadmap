@@ -1,6 +1,7 @@
 export type Stage =
   | 'prioritize'
   | 'roadmap'
+  | 'prd'
   | 'deploy'
   | 'pilot'
   | 'ga'
@@ -124,6 +125,7 @@ export const factorDivergence = (
 export const STAGE_LABELS: Record<Stage, string> = {
   prioritize: 'Prioritize',
   roadmap: 'Calendar',
+  prd: 'PRD',
   deploy: 'Deploy',
   pilot: 'Pilot',
   ga: 'GA',
@@ -133,6 +135,7 @@ export const STAGE_LABELS: Record<Stage, string> = {
 
 export const STAGE_ORDER: Stage[] = [
   'prioritize',
+  'prd',
   'roadmap',
   'deploy',
   'pilot',

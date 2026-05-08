@@ -215,12 +215,8 @@ function StagePanel({
       )}
 
       {info.stage === 'prioritize' && <CaretBreakdown initiative={initiative} />}
-      {info.stage === 'roadmap' && (
-        <>
-          <PathVendorEditor initiative={initiative} />
-          <TimelineEditor initiative={initiative} />
-        </>
-      )}
+      {info.stage === 'prd' && <PathVendorEditor initiative={initiative} />}
+      {info.stage === 'roadmap' && <TimelineEditor initiative={initiative} />}
 
       {info.offlineNote && isViewingCurrent && (
         <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">

@@ -2,6 +2,7 @@ import { STAGE_LABELS, type Stage } from '../types';
 
 const STYLES: Record<Stage, string> = {
   prioritize: 'bg-gray-100 text-gray-700',
+  prd: 'bg-cyan-50 text-cyan-700',
   roadmap: 'bg-blue-50 text-blue-700',
   deploy: 'bg-indigo-50 text-indigo-700',
   pilot: 'bg-purple-50 text-purple-700',

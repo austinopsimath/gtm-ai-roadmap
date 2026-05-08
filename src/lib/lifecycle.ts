@@ -2,6 +2,7 @@ import { calculatePriorityScore, type Initiative, type Stage } from '../types';
 
 export const PROGRESSION: Stage[] = [
   'prioritize',
+  'prd',
   'roadmap',
   'deploy',
   'pilot',
@@ -89,8 +90,8 @@ export function getStageInfo(
       const advanceAction = isCurrent && scored
         ? {
             kind: 'advance' as const,
-            label: 'Advance to Stage 2 (Calendar) →',
-            target: 'roadmap',
+            label: 'Advance to Stage 2 (PRD) →',
+            target: 'prd',
           }
         : undefined;
       const scoreNavigate = {
@@ -108,12 +109,12 @@ export function getStageInfo(
         headline: !scored
           ? 'Score this initiative with CARET'
           : isCurrent
-            ? 'Stage 1 complete — advance to Calendar'
+            ? 'Stage 1 complete — advance to PRD'
             : 'Stage 1: Prioritize',
         body: !scored
           ? "Capture each panelist's scores across the five factors. The wizard computes a Priority Score and flags divergence so the panel can resolve it before the score is finalized."
           : isCurrent
-            ? 'The panel has scored this initiative. The Roadmap Owner now places it on the calendar, accounting for cumulative cognitive load against other in-flight initiatives.'
+            ? 'The panel has scored this initiative. Next, write the PRD — the framework\'s gate artifact that documents path, vendor, success metrics, pilot plan, and the conditional Accountability Compact.'
             : 'CARET scoring captured by the panel. Re-score whenever the panel reconvenes or scope changes.',
         tasks,
         offlineNote:
@@ -128,11 +129,7 @@ export function getStageInfo(
       };
     }
 
-    case 'roadmap': {
-      const timelineSet =
-        !!initiative.deployStartDate &&
-        !!initiative.pilotStartDate &&
-        !!initiative.gaDate;
+    case 'prd': {
       const isBuyPath = initiative.path === 'buy';
       const vendorNamed = !!initiative.primaryVendor.trim();
       const tasks: LifecycleTask[] = [
@@ -155,18 +152,29 @@ export function getStageInfo(
             ]
           : []),
         {
-          label: 'Placed on calendar (Deploy / Pilot / GA dates set)',
-          isComplete: timelineSet,
-        },
-        {
-          label: 'PRD approved with conditional Accountability Compact',
+          label: 'PRD sections drafted (1–12)',
           isComplete: false,
           comingSoon: true,
         },
         {
+          label: 'Conditional Accountability Compact captured (Section 13)',
+          isComplete: false,
+          comingSoon: true,
+        },
+        {
+          label: 'Scoring panel approved the PRD',
+          isComplete: false,
+          hint: 'Tracked offline.',
+        },
+        {
+          label: 'Executive sponsor conditionally signed the Compact',
+          isComplete: false,
+          hint: 'Tracked offline until Phase 5 ships the Compact ceremony.',
+        },
+        {
           label: 'Resources allocated (build capacity, enablement, budget)',
           isComplete: false,
-          hint: 'Tracked offline for now.',
+          hint: 'Tracked offline.',
         },
       ];
       return {
@@ -176,16 +184,52 @@ export function getStageInfo(
         isPast,
         isCurrent,
         isFuture,
-        headline: 'Stage 2: Calendar',
-        body: 'Place the initiative on a calendar with cognitive-load constraints, prepare the PRD, and get conditional executive sign-off on the Accountability Compact before advancing to Deploy.',
+        headline: 'Stage 2: PRD',
+        body: 'Write the 13-section PRD — the framework\'s gate artifact that documents path, vendor, success metrics, pilot plan, and the conditional Accountability Compact (Section 13). Once the panel approves and the conditional Compact is signed, the initiative is ready to be placed on the calendar.',
         tasks,
         offlineNote: isCurrent
-          ? 'The roadmap calendar and PRD builder are coming in future phases. Use the framework markdown to guide offline work; advance the stage once the PRD is approved.'
+          ? 'The PRD builder is coming in a future phase. For now, write the PRD offline using the framework markdown and advance once it\'s approved with the conditional Compact signed.'
           : undefined,
         primaryAction: isCurrent
           ? {
               kind: 'advance',
-              label: 'Advance to Stage 3 (Deploy) →',
+              label: 'Advance to Stage 3 (Calendar) →',
+              target: 'roadmap',
+            }
+          : undefined,
+      };
+    }
+
+    case 'roadmap': {
+      const timelineSet =
+        !!initiative.deployStartDate &&
+        !!initiative.pilotStartDate &&
+        !!initiative.gaDate;
+      const tasks: LifecycleTask[] = [
+        {
+          label: 'Placed on calendar (Deploy / Pilot / GA dates set)',
+          isComplete: timelineSet,
+        },
+        {
+          label: 'Cumulative cognitive load checked against portfolio capacity',
+          isComplete: false,
+          hint: 'Verify on the portfolio roadmap before advancing.',
+        },
+      ];
+      return {
+        stage,
+        ordinalIndex: stageIdx,
+        isTerminal: false,
+        isPast,
+        isCurrent,
+        isFuture,
+        headline: 'Stage 3: Calendar',
+        body: 'Place the initiative on a calendar — Deploy / Pilot / GA boundaries — and verify the cumulative cognitive load across the portfolio stays under the framework\'s ~10 ceiling. The path, vendor, and PRD work was already settled in Stage 2.',
+        tasks,
+        primaryAction: isCurrent
+          ? {
+              kind: 'advance',
+              label: 'Advance to Stage 4 (Deploy) →',
               target: 'deploy',
             }
           : undefined,
@@ -237,8 +281,8 @@ export function getStageInfo(
         isPast,
         isCurrent,
         isFuture,
-        headline: 'Stage 3: Deploy',
-        body: 'Execute the approved PRD — build the custom solution or procure and onboard the vendor — to a state ready for controlled pilot testing. Discoveries surface a PRD revision before the Stage 3 → 4 gate.',
+        headline: 'Stage 4: Deploy',
+        body: 'Execute the approved PRD — build the custom solution or procure and onboard the vendor — to a state ready for controlled pilot testing. Discoveries surface a PRD revision before advancing to Pilot.',
         tasks,
         offlineNote: isCurrent
           ? 'The workstream tracker and PRD revision flow are coming. Use the framework markdown for now; advance once the gate criteria are met.'
@@ -246,7 +290,7 @@ export function getStageInfo(
         primaryAction: isCurrent
           ? {
               kind: 'advance',
-              label: 'Advance to Stage 4 (Pilot) →',
+              label: 'Advance to Stage 5 (Pilot) →',
               target: 'pilot',
             }
           : undefined,
@@ -288,7 +332,7 @@ export function getStageInfo(
         isPast,
         isCurrent,
         isFuture,
-        headline: 'Stage 4: Pilot',
+        headline: 'Stage 5: Pilot',
         body: 'Test with a controlled cohort. Use Level 1 (Behavior) metrics as your early-warning system; the Scale decision hinges on Level 3 (Impact). The pilot decision and the executed Compact are the gate to GA.',
         tasks,
         offlineNote: isCurrent
@@ -297,7 +341,7 @@ export function getStageInfo(
         primaryAction: isCurrent
           ? {
               kind: 'advance',
-              label: 'Advance to Stage 5 (GA) →',
+              label: 'Advance to Stage 6 (GA) →',
               target: 'ga',
             }
           : undefined,
@@ -339,7 +383,7 @@ export function getStageInfo(
         isPast,
         isCurrent,
         isFuture,
-        headline: 'Stage 5: GA',
+        headline: 'Stage 6: GA',
         body: 'The first 90 days are a managed reinforcement period — Onboard, Reinforce, Embed. After day 90, ongoing measurement and decay monitoring sustain adoption. Most GTM AI initiatives that fail, fail here through slow decay.',
         tasks,
         offlineNote: isCurrent

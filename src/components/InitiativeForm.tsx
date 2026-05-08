@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import {
   HEALTH_LABELS,
-  PATH_LABELS,
   STAGE_LABELS,
   STAGE_ORDER,
   todayISO,
@@ -177,49 +176,10 @@ export default function InitiativeForm({
         </div>
       </Section>
 
-      <Section title="Scope">
-        <Field label="Path">
-          <div className="flex gap-3 text-sm">
-            {(['build', 'buy'] as Path[]).map((p) => (
-              <label key={p} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="path"
-                  checked={values.path === p}
-                  onChange={() => {
-                    setField('path', p);
-                    if (p !== 'buy') setField('primaryVendor', '');
-                  }}
-                />
-                {PATH_LABELS[p]}
-              </label>
-            ))}
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="path"
-                checked={values.path === null}
-                onChange={() => {
-                  setField('path', null);
-                  setField('primaryVendor', '');
-                }}
-              />
-              Not yet decided
-            </label>
-          </div>
-        </Field>
-        {values.path === 'buy' && (
-          <Combobox
-            mode="single"
-            label="Primary vendor"
-            options={technologyOptions}
-            selected={values.primaryVendor}
-            onChange={(v) => setField('primaryVendor', v)}
-            onCreateOption={(v) => addCustomOption('technologies', v)}
-            placeholder="Select or add a vendor..."
-            help="The single primary vendor this initiative depends on. Full evaluation list lives in the PRD."
-          />
-        )}
+      <Section
+        title="Scope"
+        subtitle="Build vs. Buy and primary vendor are decided in the Calendar stage, not at intake — they live in the lifecycle view alongside timeline planning."
+      >
         <Combobox
           mode="multi"
           label="Audiences served"
