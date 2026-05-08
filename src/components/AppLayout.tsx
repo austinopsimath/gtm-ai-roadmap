@@ -71,6 +71,18 @@ export default function AppLayout() {
             >
               Registry
             </NavLink>
+            <NavLink
+              to="/roadmap"
+              className={({ isActive }) =>
+                `rounded-md px-3 py-1.5 ${
+                  isActive
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`
+              }
+            >
+              Roadmap
+            </NavLink>
           </nav>
           <div className="flex items-center gap-2">
             <input
