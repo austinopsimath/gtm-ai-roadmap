@@ -1,5 +1,7 @@
 # GTM AI Roadmap Management
 
+**Live app:** https://gtm-ai-roadmap.netlify.app/
+
 An interactive companion to the **GTM AI Roadmap Management** framework — a structured operating system for selecting, sequencing, building, piloting, and embedding GTM AI initiatives.
 
 The framework itself lives at [GTM_AI_Roadmap_Framework.md](GTM_AI_Roadmap_Framework.md). This app operationalizes it.
