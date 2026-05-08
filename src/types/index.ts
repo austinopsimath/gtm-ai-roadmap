@@ -29,6 +29,13 @@ export interface CARETNotes {
 
 export type CARETFactor = 'c' | 'a' | 'r' | 'e' | 't';
 
+export interface Panelist {
+  id: string;
+  name: string;
+  role: string;
+  scores: CARETScores;
+}
+
 export interface Initiative {
   id: string;
   name: string;
@@ -43,6 +50,7 @@ export interface Initiative {
   systemsTouched: string[];
   caret: CARETScores;
   caretNotes: CARETNotes;
+  panelists: Panelist[];
   scoredAt: string | null;
   scoredBy: string;
   level3Metric: string;
@@ -53,6 +61,56 @@ export interface Initiative {
   createdAt: string;
   updatedAt: string;
 }
+
+export const FACTOR_KEYS: CARETFactor[] = ['c', 'a', 'r', 'e', 't'];
+
+export const emptyScores = (): CARETScores => ({
+  c: 0,
+  a: 0,
+  r: 0,
+  e: 0,
+  t: 0,
+});
+
+export const createPanelist = (
+  partial: Partial<Panelist> = {},
+): Panelist => ({
+  id: partial.id ?? crypto.randomUUID(),
+  name: partial.name ?? '',
+  role: partial.role ?? '',
+  scores: partial.scores ?? emptyScores(),
+});
+
+export const computeFactorAverage = (
+  panelists: Panelist[],
+  factor: CARETFactor,
+): number => {
+  const values = panelists
+    .map((p) => p.scores[factor])
+    .filter((v) => v > 0);
+  if (values.length === 0) return 0;
+  const sum = values.reduce((a, b) => a + b, 0);
+  return sum / values.length;
+};
+
+export const computeConsensusScores = (panelists: Panelist[]): CARETScores => ({
+  c: computeFactorAverage(panelists, 'c'),
+  a: computeFactorAverage(panelists, 'a'),
+  r: computeFactorAverage(panelists, 'r'),
+  e: computeFactorAverage(panelists, 'e'),
+  t: computeFactorAverage(panelists, 't'),
+});
+
+export const factorDivergence = (
+  panelists: Panelist[],
+  factor: CARETFactor,
+): number => {
+  const values = panelists
+    .map((p) => p.scores[factor])
+    .filter((v) => v > 0);
+  if (values.length < 2) return 0;
+  return Math.max(...values) - Math.min(...values);
+};
 
 export const STAGE_LABELS: Record<Stage, string> = {
   prioritize: 'Prioritize',
@@ -109,8 +167,9 @@ export const createInitiative = (
     audiencesServed: partial.audiencesServed ?? [],
     technologies: partial.technologies ?? [],
     systemsTouched: partial.systemsTouched ?? [],
-    caret: partial.caret ?? { c: 0, a: 0, r: 0, e: 0, t: 0 },
+    caret: partial.caret ?? emptyScores(),
     caretNotes: partial.caretNotes ?? { c: '', a: '', r: '', e: '', t: '' },
+    panelists: partial.panelists ?? [],
     scoredAt: partial.scoredAt ?? null,
     scoredBy: partial.scoredBy ?? '',
     level3Metric: partial.level3Metric ?? '',

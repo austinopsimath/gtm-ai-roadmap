@@ -26,6 +26,7 @@ type LegacyInitiativeV1 = Omit<
   | 'caretNotes'
   | 'scoredAt'
   | 'scoredBy'
+  | 'panelists'
 > & {
   audiencesServed?: string | string[];
   technologies?: string | string[];
@@ -33,6 +34,7 @@ type LegacyInitiativeV1 = Omit<
   caretNotes?: Initiative['caretNotes'];
   scoredAt?: string | null;
   scoredBy?: string;
+  panelists?: Initiative['panelists'];
 };
 
 const splitLegacyString = (raw: string | string[] | undefined): string[] => {
@@ -44,17 +46,39 @@ const splitLegacyString = (raw: string | string[] | undefined): string[] => {
     .filter(Boolean);
 };
 
-const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => ({
-  ...(raw as unknown as Initiative),
-  audiencesServed: splitLegacyString(raw.audiencesServed),
-  technologies: splitLegacyString(raw.technologies),
-  systemsTouched: splitLegacyString(raw.systemsTouched),
-  caretNotes: raw.caretNotes ?? { c: '', a: '', r: '', e: '', t: '' },
-  scoredAt: raw.scoredAt ?? null,
-  scoredBy: raw.scoredBy ?? '',
-});
+const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => {
+  const caret = raw.caret ?? { c: 0, a: 0, r: 0, e: 0, t: 0 };
+  const hasExistingScores = Object.values(caret).some((v) => v > 0);
+  // If there are existing consensus scores but no panelists yet, seed a single
+  // synthetic "Consensus" panelist so the new panel data model has something
+  // to derive from.
+  const seededPanelists =
+    raw.panelists && raw.panelists.length > 0
+      ? raw.panelists
+      : hasExistingScores
+        ? [
+            {
+              id: crypto.randomUUID(),
+              name: 'Consensus',
+              role: 'Imported from prior scoring',
+              scores: caret,
+            },
+          ]
+        : [];
+  return {
+    ...(raw as unknown as Initiative),
+    audiencesServed: splitLegacyString(raw.audiencesServed),
+    technologies: splitLegacyString(raw.technologies),
+    systemsTouched: splitLegacyString(raw.systemsTouched),
+    caret,
+    caretNotes: raw.caretNotes ?? { c: '', a: '', r: '', e: '', t: '' },
+    panelists: seededPanelists,
+    scoredAt: raw.scoredAt ?? null,
+    scoredBy: raw.scoredBy ?? '',
+  };
+};
 
-const STORE_VERSION = 3;
+const STORE_VERSION = 4;
 
 export const useRoadmapStore = create<RoadmapState>()(
   persist(

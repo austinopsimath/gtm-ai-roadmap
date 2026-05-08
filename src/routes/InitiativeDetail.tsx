@@ -5,6 +5,7 @@ import {
   PATH_LABELS,
   STAGE_LABELS,
   calculatePriorityScore,
+  factorDivergence,
 } from '../types';
 import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import { formatRelativeTime } from '../lib/time';
@@ -33,6 +34,7 @@ export default function InitiativeDetail() {
 
   const priorityScore = calculatePriorityScore(initiative.caret);
   const isScored = priorityScore !== null;
+  const hasPanelists = initiative.panelists.length > 0;
 
   return (
     <div>
@@ -41,7 +43,7 @@ export default function InitiativeDetail() {
           ← Registry
         </Link>
       </div>
-      <header className="mb-8 flex items-start justify-between gap-4">
+      <header className="mb-6 flex items-start justify-between gap-4">
         <div>
           <div className="mb-2 flex items-center gap-2">
             <StageBadge stage={initiative.stage} />
@@ -71,6 +73,32 @@ export default function InitiativeDetail() {
           </button>
         </div>
       </header>
+
+      {!isScored && (
+        <section className="mb-6 rounded-lg bg-gray-900 p-8 text-white">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            <div className="max-w-2xl">
+              <div className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Next step
+              </div>
+              <h2 className="mt-1 text-xl font-semibold">
+                Score this initiative with CARET
+              </h2>
+              <p className="mt-2 text-sm text-gray-300">
+                Capture each stakeholder's score across the five factors. The
+                wizard computes a Priority Score and flags divergence so the
+                panel can resolve it before the score is finalized.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(`/initiatives/${initiative.id}/score`)}
+              className="shrink-0 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 hover:bg-gray-100"
+            >
+              Begin CARET scoring →
+            </button>
+          </div>
+        </section>
+      )}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card title="Ownership">
@@ -114,31 +142,84 @@ export default function InitiativeDetail() {
         <Card
           title="CARET scores"
           action={
-            <button
-              onClick={() => navigate(`/initiatives/${initiative.id}/score`)}
-              className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
-            >
-              {isScored ? 'Re-score' : 'Score now'}
-            </button>
+            isScored && (
+              <button
+                onClick={() => navigate(`/initiatives/${initiative.id}/score`)}
+                className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
+              >
+                Re-score
+              </button>
+            )
           }
         >
           {isScored ? (
             <>
               <div className="grid grid-cols-5 gap-2 text-center">
-                {FACTOR_ORDER.map((f) => (
-                  <div key={f} className="rounded-md bg-gray-50 px-2 py-3">
-                    <div className="text-xs text-gray-500">
-                      {FACTORS[f].letter}
+                {FACTOR_ORDER.map((f) => {
+                  const value = initiative.caret[f];
+                  const divergence = factorDivergence(
+                    initiative.panelists,
+                    f,
+                  );
+                  const flagged = divergence >= 2;
+                  return (
+                    <div
+                      key={f}
+                      className={`rounded-md px-2 py-3 ${
+                        flagged ? 'bg-amber-50' : 'bg-gray-50'
+                      }`}
+                    >
+                      <div className="text-xs text-gray-500">
+                        {FACTORS[f].letter}
+                      </div>
+                      <div className="font-mono text-lg font-semibold text-gray-900">
+                        {value > 0 ? formatNumber(value) : '—'}
+                      </div>
                     </div>
-                    <div className="text-lg font-semibold text-gray-900">
-                      {initiative.caret[f]}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-              {initiative.scoredBy && (
+              {hasPanelists && (
                 <div className="mt-4">
-                  <div className="text-xs text-gray-500">Scored by</div>
+                  <div className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Panel ({initiative.panelists.length})
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    {initiative.panelists.map((p) => (
+                      <div
+                        key={p.id}
+                        className="flex flex-wrap items-baseline justify-between gap-x-2 rounded-md bg-gray-50 px-2 py-1.5"
+                      >
+                        <div>
+                          <span className="font-medium text-gray-900">
+                            {p.name}
+                          </span>
+                          {p.role && (
+                            <span className="ml-2 text-gray-500">
+                              {p.role}
+                            </span>
+                          )}
+                        </div>
+                        <div className="font-mono text-gray-600">
+                          {FACTOR_ORDER.map((f) => (
+                            <span key={f} className="ml-1.5">
+                              {FACTORS[f].letter}:{' '}
+                              {p.scores[f] > 0
+                                ? formatNumber(p.scores[f])
+                                : '—'}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {initiative.scoredBy && (
+                <div className="mt-3">
+                  <div className="text-xs text-gray-500">
+                    Panel description
+                  </div>
                   <div className="text-sm text-gray-900">
                     {initiative.scoredBy}
                   </div>
@@ -173,11 +254,9 @@ export default function InitiativeDetail() {
               )}
             </>
           ) : (
-            <p className="text-sm text-gray-500">
-              Not yet scored. Use the CARET wizard to capture scores for
-              Complexity, Alignment, Results, Effort, and Timeline — and
-              compute a Priority Score.
-            </p>
+            <div className="text-sm text-gray-500">
+              Use the hero card above to begin the CARET scoring wizard.
+            </div>
           )}
         </Card>
 
@@ -274,4 +353,9 @@ function ChipsDetail({ label, values }: { label: string; values: string[] }) {
       )}
     </div>
   );
+}
+
+function formatNumber(value: number): string {
+  if (Number.isInteger(value)) return value.toString();
+  return value.toFixed(2);
 }
