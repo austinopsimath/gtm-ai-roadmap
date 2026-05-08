@@ -19,6 +19,16 @@ export interface CARETScores {
   t: number;
 }
 
+export interface CARETNotes {
+  c: string;
+  a: string;
+  r: string;
+  e: string;
+  t: string;
+}
+
+export type CARETFactor = 'c' | 'a' | 'r' | 'e' | 't';
+
 export interface Initiative {
   id: string;
   name: string;
@@ -32,6 +42,9 @@ export interface Initiative {
   technologies: string[];
   systemsTouched: string[];
   caret: CARETScores;
+  caretNotes: CARETNotes;
+  scoredAt: string | null;
+  scoredBy: string;
   level3Metric: string;
   intakeDate: string | null;
   pilotStartDate: string | null;
@@ -97,6 +110,9 @@ export const createInitiative = (
     technologies: partial.technologies ?? [],
     systemsTouched: partial.systemsTouched ?? [],
     caret: partial.caret ?? { c: 0, a: 0, r: 0, e: 0, t: 0 },
+    caretNotes: partial.caretNotes ?? { c: '', a: '', r: '', e: '', t: '' },
+    scoredAt: partial.scoredAt ?? null,
+    scoredBy: partial.scoredBy ?? '',
     level3Metric: partial.level3Metric ?? '',
     intakeDate: partial.intakeDate ?? todayISO(),
     pilotStartDate: partial.pilotStartDate ?? null,

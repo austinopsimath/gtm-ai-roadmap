@@ -6,6 +6,7 @@ import {
   STAGE_LABELS,
   calculatePriorityScore,
 } from '../types';
+import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import { formatRelativeTime } from '../lib/time';
 import HealthBadge from '../components/HealthBadge';
 import StageBadge from '../components/StageBadge';
@@ -110,31 +111,72 @@ export default function InitiativeDetail() {
           <Detail label="Level 3 metric" value={initiative.level3Metric} />
         </Card>
 
-        <Card title="CARET scores">
+        <Card
+          title="CARET scores"
+          action={
+            <button
+              onClick={() => navigate(`/initiatives/${initiative.id}/score`)}
+              className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
+            >
+              {isScored ? 'Re-score' : 'Score now'}
+            </button>
+          }
+        >
           {isScored ? (
-            <div className="grid grid-cols-5 gap-2 text-center">
-              {(
-                [
-                  ['C', initiative.caret.c],
-                  ['A', initiative.caret.a],
-                  ['R', initiative.caret.r],
-                  ['E', initiative.caret.e],
-                  ['T', initiative.caret.t],
-                ] as const
-              ).map(([label, value]) => (
-                <div key={label} className="rounded-md bg-gray-50 px-2 py-3">
-                  <div className="text-xs text-gray-500">{label}</div>
-                  <div className="text-lg font-semibold text-gray-900">
-                    {value}
+            <>
+              <div className="grid grid-cols-5 gap-2 text-center">
+                {FACTOR_ORDER.map((f) => (
+                  <div key={f} className="rounded-md bg-gray-50 px-2 py-3">
+                    <div className="text-xs text-gray-500">
+                      {FACTORS[f].letter}
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {initiative.caret[f]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {initiative.scoredBy && (
+                <div className="mt-4">
+                  <div className="text-xs text-gray-500">Scored by</div>
+                  <div className="text-sm text-gray-900">
+                    {initiative.scoredBy}
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+              {initiative.scoredAt && (
+                <div className="mt-2 text-xs text-gray-500">
+                  Scored {formatRelativeTime(initiative.scoredAt)}
+                </div>
+              )}
+              {FACTOR_ORDER.some((f) => initiative.caretNotes[f].trim()) && (
+                <div className="mt-4 space-y-2">
+                  <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Discussion notes
+                  </div>
+                  {FACTOR_ORDER.map((f) =>
+                    initiative.caretNotes[f].trim() ? (
+                      <div
+                        key={f}
+                        className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                      >
+                        <span className="font-medium text-gray-900">
+                          {FACTORS[f].letter}:
+                        </span>{' '}
+                        <span className="text-gray-700">
+                          {initiative.caretNotes[f]}
+                        </span>
+                      </div>
+                    ) : null,
+                  )}
+                </div>
+              )}
+            </>
           ) : (
             <p className="text-sm text-gray-500">
-              Not yet scored. Phase 2 will add a guided scoring flow with the
-              full CARET methodology, multi-scorer support, and divergence
-              resolution.
+              Not yet scored. Use the CARET wizard to capture scores for
+              Complexity, Alignment, Results, Effort, and Timeline — and
+              compute a Priority Score.
             </p>
           )}
         </Card>
@@ -159,9 +201,9 @@ export default function InitiativeDetail() {
       </div>
 
       <div className="mt-8 rounded-md border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500">
-        Phase 1 detail view. Subsequent phases will add: CARET scoring wizard,
-        gate checklist sidebar, PRD builder, Accountability Compact, GA tracking,
-        and roadmap positioning.
+        Subsequent phases will add: roadmap positioning with cognitive load,
+        gate checklist sidebar, PRD builder, Accountability Compact, and GA
+        tracking.
       </div>
     </div>
   );
@@ -169,16 +211,21 @@ export default function InitiativeDetail() {
 
 function Card({
   title,
+  action,
   children,
 }: {
   title: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-5">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-        {title}
-      </h2>
+      <header className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+          {title}
+        </h2>
+        {action}
+      </header>
       <div className="space-y-3">{children}</div>
     </section>
   );

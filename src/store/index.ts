@@ -20,11 +20,19 @@ interface RoadmapState {
 
 type LegacyInitiativeV1 = Omit<
   Initiative,
-  'audiencesServed' | 'technologies' | 'systemsTouched'
+  | 'audiencesServed'
+  | 'technologies'
+  | 'systemsTouched'
+  | 'caretNotes'
+  | 'scoredAt'
+  | 'scoredBy'
 > & {
   audiencesServed?: string | string[];
   technologies?: string | string[];
   systemsTouched?: string | string[];
+  caretNotes?: Initiative['caretNotes'];
+  scoredAt?: string | null;
+  scoredBy?: string;
 };
 
 const splitLegacyString = (raw: string | string[] | undefined): string[] => {
@@ -41,9 +49,12 @@ const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => ({
   audiencesServed: splitLegacyString(raw.audiencesServed),
   technologies: splitLegacyString(raw.technologies),
   systemsTouched: splitLegacyString(raw.systemsTouched),
+  caretNotes: raw.caretNotes ?? { c: '', a: '', r: '', e: '', t: '' },
+  scoredAt: raw.scoredAt ?? null,
+  scoredBy: raw.scoredBy ?? '',
 });
 
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 
 export const useRoadmapStore = create<RoadmapState>()(
   persist(
@@ -98,7 +109,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         const raw = persistedState as Record<string, unknown>;
         const legacyInitiatives =
           (raw.initiatives as LegacyInitiativeV1[] | undefined) ?? [];
-        if (version < 2) {
+        if (version < STORE_VERSION) {
           return {
             ...raw,
             initiatives: legacyInitiatives.map(migrateLegacyInitiative),

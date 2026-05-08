@@ -4,6 +4,7 @@ import Dashboard from './routes/Dashboard';
 import NewInitiative from './routes/NewInitiative';
 import EditInitiative from './routes/EditInitiative';
 import InitiativeDetail from './routes/InitiativeDetail';
+import ScoreInitiative from './routes/ScoreInitiative';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/initiatives/new" element={<NewInitiative />} />
         <Route path="/initiatives/:id" element={<InitiativeDetail />} />
         <Route path="/initiatives/:id/edit" element={<EditInitiative />} />
+        <Route path="/initiatives/:id/score" element={<ScoreInitiative />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
