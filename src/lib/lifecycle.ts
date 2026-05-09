@@ -1,4 +1,5 @@
 import { calculatePriorityScore, type Initiative, type Stage } from '../types';
+import { isPRDSectionComplete } from './prdProgress';
 
 export const PROGRESSION: Stage[] = [
   'prioritize',
@@ -44,9 +45,6 @@ export interface StageInfo {
   };
 }
 
-const ownerNamed = (i: Initiative) => i.initiativeOwner.trim().length > 0;
-const sponsorNamed = (i: Initiative) => i.executiveSponsor.trim().length > 0;
-const pathChosen = (i: Initiative) => i.path !== null;
 const isScored = (i: Initiative) =>
   calculatePriorityScore(i.caret) !== null;
 
@@ -131,101 +129,35 @@ export function getStageInfo(
     }
 
     case 'prd': {
-      const isBuyPath = initiative.path === 'buy';
-      const vendorNamed = !!initiative.primaryVendor.trim();
-      const summarySectionDone =
-        !!initiative.name.trim() &&
-        !!initiative.description.trim() &&
-        ownerNamed(initiative) &&
-        sponsorNamed(initiative);
-      const targetUsersSectionDone = initiative.audiencesServed.length > 0;
-      const businessNeedSectionDone = isScored(initiative);
-      const pathSectionDone =
-        pathChosen(initiative) && (!isBuyPath || vendorNamed);
-      const systemsSectionDone = initiative.systemsTouched.length > 0;
+      const sectionTitles: Record<string, string> = {
+        '1': 'Initiative Summary',
+        '2': 'Target Users',
+        '3': 'Business Need + CARET Context',
+        '4': 'Success Metrics — All Three Layers',
+        '5': 'Path (Build vs. Buy)',
+        '6': 'Systems and Integrations',
+        '7': 'Data Architecture',
+        '8': 'Risk Assessment',
+        '9': 'Pilot Plan',
+        '10': 'Workstream Assignments',
+        '11': 'Measurement Cadence',
+        '12': 'Approval Mechanism',
+        '13': 'Conditional Accountability Compact',
+      };
 
-      const prdSections: LifecycleTask[] = [
-        {
-          label: 'Section 1: Initiative Summary',
-          isComplete: summarySectionDone,
-          hint: !summarySectionDone
-            ? 'Needs name, description, owner, and sponsor — captured on the initiative profile.'
-            : undefined,
-        },
-        {
-          label: 'Section 2: Target Users',
-          isComplete: targetUsersSectionDone,
-          hint: !targetUsersSectionDone
-            ? 'Set Audiences served on the initiative profile.'
-            : undefined,
-        },
-        {
-          label: 'Section 3: Business Need + CARET Context',
-          isComplete: businessNeedSectionDone,
-          hint: !businessNeedSectionDone
-            ? 'Complete CARET scoring in Stage 1.'
-            : undefined,
-        },
-        {
-          label: 'Section 4: Success Metrics — All Three Layers',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 5: Path (Build vs. Buy)',
-          isComplete: pathSectionDone,
-          hint: !pathSectionDone
-            ? isBuyPath
-              ? 'Buy path needs a primary vendor named below.'
-              : 'Decide Build vs. Buy below.'
-            : undefined,
-        },
-        {
-          label: 'Section 6: Systems and Integrations',
-          isComplete: systemsSectionDone,
-          hint: !systemsSectionDone
-            ? 'Set Systems Touched on the initiative profile.'
-            : undefined,
-        },
-        {
-          label: 'Section 7: Data Architecture',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 8: Risk Assessment',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 9: Pilot Plan',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 10: Workstream Assignments',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 11: Measurement Cadence',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 12: Approval Mechanism',
-          isComplete: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Section 13: Conditional Accountability Compact',
-          isComplete: false,
-          comingSoon: true,
-        },
-      ];
+      const prdSections: LifecycleTask[] = Object.entries(sectionTitles).map(
+        ([id, title]) => ({
+          label: `Section ${id}: ${title}`,
+          isComplete: isPRDSectionComplete(initiative, id),
+        }),
+      );
 
       const sectionsComplete = prdSections.filter((s) => s.isComplete).length;
       const allSectionsDone = sectionsComplete === prdSections.length;
+      const compactSigned =
+        initiative.prd.compact.conditionalStatus === 'yes' ||
+        initiative.prd.compact.conditionalStatus === 'conditional_yes';
+      const prdApproved = initiative.prd.approvalStatus === 'approved';
 
       const tasks: LifecycleTask[] = [
         {
@@ -235,13 +167,17 @@ export function getStageInfo(
         },
         {
           label: 'Scoring panel approved the PRD',
-          isComplete: false,
-          hint: 'Tracked offline.',
+          isComplete: prdApproved,
+          hint: prdApproved
+            ? undefined
+            : 'Set the approval status to "Approved" in PRD Section 12 once the panel signs off.',
         },
         {
           label: 'Executive sponsor conditionally signed the Compact',
-          isComplete: false,
-          hint: 'Tracked offline until Phase 5 ships the Compact ceremony.',
+          isComplete: compactSigned,
+          hint: compactSigned
+            ? undefined
+            : 'Capture the exec\'s conditional response in PRD Section 13.',
         },
         {
           label: 'Resources allocated (build capacity, enablement, budget)',

@@ -37,6 +37,149 @@ export interface Panelist {
   scores: CARETScores;
 }
 
+// ===== PRD types =====
+
+export type MetricLevel = 1 | 2 | 3;
+export type MetricCadence = 'daily' | 'weekly' | 'monthly' | 'quarterly';
+
+export interface MetricDef {
+  id: string;
+  level: MetricLevel;
+  name: string;
+  baseline: string;
+  target: string;
+  cadence: MetricCadence;
+  trackingMechanism: string;
+}
+
+export type RiskDispositionType = 'accept' | 'mitigate' | 'escalate' | null;
+
+export interface RiskDisposition {
+  disposition: RiskDispositionType;
+  notes: string;
+}
+
+export interface PRDRisks {
+  newUI: RiskDisposition;
+  overlappingCapabilities: RiskDisposition;
+  dataQuality: RiskDisposition;
+  integrationFragility: RiskDisposition;
+  vendorLockIn: RiskDisposition;
+}
+
+export interface PilotPlan {
+  cohortDescription: string;
+  cohortRationale: string;
+  timeline: string;
+  interventionDesign: string;
+  scaleDecision: string;
+  fixDecision: string;
+  killDecision: string;
+}
+
+export interface Workstream {
+  id: string;
+  name: string;
+  description: string;
+  owner: string;
+  targetDate: string | null;
+}
+
+export type CompactConditionalStatus =
+  | 'pending'
+  | 'yes'
+  | 'conditional_yes'
+  | 'no';
+
+export interface CompactState {
+  coachingCadenceFrequency: number;
+  coachingCadencePeriod: 'month' | 'quarter';
+  reinforcementActivitiesCount: number;
+  conditionalStatus: CompactConditionalStatus;
+  conditionalNotes: string;
+  conditionalCapturedAt: string | null;
+}
+
+export type PRDApprovalStatus = 'draft' | 'approved' | 'revised';
+
+export interface PRD {
+  metrics: MetricDef[];
+  pathRationale: string;
+  dataArchitecture: string;
+  risks: PRDRisks;
+  pilotPlan: PilotPlan;
+  workstreams: Workstream[];
+  approvalMechanism: string;
+  approvalStatus: PRDApprovalStatus;
+  approvedAt: string | null;
+  compact: CompactState;
+}
+
+export const emptyRiskDisposition = (): RiskDisposition => ({
+  disposition: null,
+  notes: '',
+});
+
+export const emptyPRDRisks = (): PRDRisks => ({
+  newUI: emptyRiskDisposition(),
+  overlappingCapabilities: emptyRiskDisposition(),
+  dataQuality: emptyRiskDisposition(),
+  integrationFragility: emptyRiskDisposition(),
+  vendorLockIn: emptyRiskDisposition(),
+});
+
+export const emptyPilotPlan = (): PilotPlan => ({
+  cohortDescription: '',
+  cohortRationale: '',
+  timeline: '',
+  interventionDesign: '',
+  scaleDecision: '',
+  fixDecision: '',
+  killDecision: '',
+});
+
+export const emptyCompactState = (): CompactState => ({
+  coachingCadenceFrequency: 0,
+  coachingCadencePeriod: 'month',
+  reinforcementActivitiesCount: 0,
+  conditionalStatus: 'pending',
+  conditionalNotes: '',
+  conditionalCapturedAt: null,
+});
+
+export const emptyPRD = (): PRD => ({
+  metrics: [],
+  pathRationale: '',
+  dataArchitecture: '',
+  risks: emptyPRDRisks(),
+  pilotPlan: emptyPilotPlan(),
+  workstreams: [],
+  approvalMechanism: '',
+  approvalStatus: 'draft',
+  approvedAt: null,
+  compact: emptyCompactState(),
+});
+
+export const createMetric = (partial: Partial<MetricDef> = {}): MetricDef => ({
+  id: partial.id ?? crypto.randomUUID(),
+  level: partial.level ?? 1,
+  name: partial.name ?? '',
+  baseline: partial.baseline ?? '',
+  target: partial.target ?? '',
+  cadence: partial.cadence ?? 'weekly',
+  trackingMechanism: partial.trackingMechanism ?? '',
+});
+
+export const createWorkstream = (
+  partial: Partial<Workstream> = {},
+): Workstream => ({
+  id: partial.id ?? crypto.randomUUID(),
+  name: partial.name ?? '',
+  description: partial.description ?? '',
+  owner: partial.owner ?? '',
+  targetDate: partial.targetDate ?? null,
+});
+
 export interface Initiative {
   id: string;
   name: string;
@@ -61,6 +204,7 @@ export interface Initiative {
   pilotStartDate: string | null;
   gaDate: string | null;
   lastReviewedDate: string | null;
+  prd: PRD;
   createdAt: string;
   updatedAt: string;
 }
@@ -191,6 +335,7 @@ export const createInitiative = (
     pilotStartDate: partial.pilotStartDate ?? null,
     gaDate: partial.gaDate ?? null,
     lastReviewedDate: partial.lastReviewedDate ?? null,
+    prd: partial.prd ?? emptyPRD(),
     createdAt: partial.createdAt ?? now,
     updatedAt: now,
   };

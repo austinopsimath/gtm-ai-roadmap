@@ -6,6 +6,7 @@ import EditInitiative from './routes/EditInitiative';
 import InitiativeDetail from './routes/InitiativeDetail';
 import ScoreInitiative from './routes/ScoreInitiative';
 import Roadmap from './routes/Roadmap';
+import PRDEdit from './routes/PRDEdit';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/initiatives/:id" element={<InitiativeDetail />} />
         <Route path="/initiatives/:id/edit" element={<EditInitiative />} />
         <Route path="/initiatives/:id/score" element={<ScoreInitiative />} />
+        <Route path="/initiatives/:id/prd" element={<PRDEdit />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

@@ -17,6 +17,7 @@ import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import { formatRelativeTime } from '../lib/time';
 import TimelineEditor from './TimelineEditor';
 import PathVendorEditor from './PathVendorEditor';
+import PRDLauncher from './PRDLauncher';
 
 interface Props {
   initiative: Initiative;
@@ -215,7 +216,12 @@ function StagePanel({
       )}
 
       {info.stage === 'prioritize' && <CaretBreakdown initiative={initiative} />}
-      {info.stage === 'prd' && <PathVendorEditor initiative={initiative} />}
+      {info.stage === 'prd' && (
+        <>
+          <PathVendorEditor initiative={initiative} />
+          <PRDLauncher initiative={initiative} />
+        </>
+      )}
       {info.stage === 'roadmap' && <TimelineEditor initiative={initiative} />}
 
       {info.offlineNote && isViewingCurrent && (

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Initiative } from '../types';
+import { emptyPRD } from '../types';
 import type { PicklistKind } from '../constants/picklists';
 
 interface RoadmapState {
@@ -9,6 +10,8 @@ interface RoadmapState {
   customAudiences: string[];
   customTechnologies: string[];
   customSystems: string[];
+  customLevel1Metrics: string[];
+  customLevel2Metrics: string[];
   customLevel3Metrics: string[];
   addInitiative: (initiative: Initiative) => void;
   updateInitiative: (id: string, patch: Partial<Initiative>) => void;
@@ -29,6 +32,7 @@ type LegacyInitiativeV1 = Omit<
   | 'panelists'
   | 'deployStartDate'
   | 'primaryVendor'
+  | 'prd'
 > & {
   audiencesServed?: string | string[];
   technologies?: string | string[];
@@ -39,6 +43,7 @@ type LegacyInitiativeV1 = Omit<
   panelists?: Initiative['panelists'];
   deployStartDate?: string | null;
   primaryVendor?: string;
+  prd?: Initiative['prd'];
 };
 
 const splitLegacyString = (raw: string | string[] | undefined): string[] => {
@@ -81,10 +86,11 @@ const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => {
     scoredBy: raw.scoredBy ?? '',
     deployStartDate: raw.deployStartDate ?? null,
     primaryVendor: raw.primaryVendor ?? '',
+    prd: raw.prd ?? emptyPRD(),
   };
 };
 
-const STORE_VERSION = 6;
+const STORE_VERSION = 7;
 
 export const useRoadmapStore = create<RoadmapState>()(
   persist(
@@ -94,6 +100,8 @@ export const useRoadmapStore = create<RoadmapState>()(
       customAudiences: [],
       customTechnologies: [],
       customSystems: [],
+      customLevel1Metrics: [],
+      customLevel2Metrics: [],
       customLevel3Metrics: [],
       addInitiative: (initiative) =>
         set((state) => ({ initiatives: [...state.initiatives, initiative] })),
@@ -124,6 +132,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             audiences: 'customAudiences',
             technologies: 'customTechnologies',
             systems: 'customSystems',
+            level1Metrics: 'customLevel1Metrics',
+            level2Metrics: 'customLevel2Metrics',
             level3Metrics: 'customLevel3Metrics',
           } as const;
           const key = map[kind];
@@ -147,6 +157,10 @@ export const useRoadmapStore = create<RoadmapState>()(
             customTechnologies:
               (raw.customTechnologies as string[] | undefined) ?? [],
             customSystems: (raw.customSystems as string[] | undefined) ?? [],
+            customLevel1Metrics:
+              (raw.customLevel1Metrics as string[] | undefined) ?? [],
+            customLevel2Metrics:
+              (raw.customLevel2Metrics as string[] | undefined) ?? [],
             customLevel3Metrics:
               (raw.customLevel3Metrics as string[] | undefined) ?? [],
           } as RoadmapState;
