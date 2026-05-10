@@ -6,7 +6,7 @@
 
 Most GTM AI initiatives fail not because the technology is wrong, but because the process of selecting, sequencing, building, and embedding AI is improvised. This framework provides a repeatable operating system for managing a GTM AI roadmap — from idea intake to full adoption — with explicit gates at every stage to prevent bad investments from advancing.
 
-The framework has six stages — **Prioritize → PRD → Calendar → Deploy → Pilot → GA** — each followed by explicit exit criteria that must be satisfied before the next stage begins. The exit criteria sections carry as much weight as the stage sections themselves; they are where the gatekeeping actually happens. The PRD (Stage 2) is the framework's most consequential planning artifact: it documents the path, success metrics, pilot design, risks, workstreams, and the conditional Accountability Compact (Section 13). Between Stages 5 and 6, the Accountability Compact is formally executed.
+The framework has six stages — **Prioritize → PRD → Calendar → Deploy → Pilot → GA** — each followed by explicit exit criteria that must be satisfied before the next stage begins. The exit criteria sections carry as much weight as the stage sections themselves; they are where the gatekeeping actually happens. The PRD (Stage 2) is the framework's most consequential planning artifact: it documents the business rationale, audiences, GTM motions touched, success metrics, path, systems, risks, pilot plan, workstreams, and the conditional Accountability Compact (Section 14). Between Stages 5 and 6, the Accountability Compact is formally executed.
 
 ---
 
@@ -45,17 +45,21 @@ For every initiative, the Registry captures:
 |---|---|
 | **Name** | Short, distinct name used everywhere this initiative is referenced |
 | **Description** | One-sentence plain-language summary of what it does |
+| **Business Rationale** | The "why this matters" articulation — what changes if this isn't done |
 | **Current Stage** | 1 (Prioritize), 2 (PRD), 3 (Calendar), 4 (Deploy), 5 (Pilot), 6 (GA), Killed, or Wound Down |
 | **Health** | Green / Yellow / Red — the Roadmap Owner's portfolio-level judgment, not a self-report from the Initiative Owner |
 | **Initiative Owner** | Named individual accountable end-to-end |
 | **Executive Sponsor** | Named leader who signed (or conditionally signed) the Accountability Compact |
-| **Path** | Build or Buy |
-| **Audiences Served** | The specific roles and segments in scope (e.g., "Enterprise AEs, EMEA"; "All SDRs"; "Frontline managers, North America") |
+| **Path** | Build or Buy (and the primary vendor, if Buy) |
+| **Primary Audiences** | The roles and segments this initiative is built for first |
+| **Secondary Audiences** | Roles and segments that benefit indirectly or in a later wave |
+| **Usage Frequency** | How often primary and secondary audiences will interact with the solution (Daily / Weekly / Monthly / Quarterly) |
+| **GTM Motions** | The motions from the AI GTM Motions Taxonomy this initiative touches — used to surface portfolio overlaps and cognitive-load risks |
 | **Technologies / Vendors** | Tools and platforms involved (e.g., Gong, Clari, custom RAG on Snowflake, internal LLM gateway) |
-| **Systems Touched** | Every system the initiative reads from, writes to, or sits alongside — populated from PRD Section 6 |
+| **Systems Touched** | Every system the initiative reads from, writes to, or sits alongside — populated from PRD Section 8 |
 | **CARET Scores** | C, A, R, E, T values plus the computed Priority Score |
 | **Level 3 Metric Targeted** | The executive-level outcome this initiative was funded to move |
-| **Key Dates** | Intake date, Pilot start, GA launch, Last review |
+| **Key Dates** | Intake date, Deploy start, Pilot start, GA launch, Last review |
 | **Last Reviewed** | Date the Roadmap Owner last confirmed the row is current |
 
 ### Maintenance
@@ -157,7 +161,7 @@ The output is a rank-ordered initiative queue. Higher-scoring initiatives advanc
 
 ## Stage 2: PRD
 
-**Purpose:** Document the full plan — path, vendor, success metrics, pilot design, risks, workstreams, measurement cadence, approval mechanism — and capture conditional executive commitment via the Accountability Compact (Section 13). The PRD is the framework's gate artifact; without an approved PRD, an initiative does not advance to scheduling.
+**Purpose:** Document the full plan — business rationale, audiences, GTM motions touched, success metrics, path, systems, risks, pilot design, workstreams, approval mechanism — and capture conditional executive commitment via the Accountability Compact (Section 14). The PRD is the framework's gate artifact; without an approved PRD, an initiative does not advance to scheduling.
 
 The PRD (Product Requirements Document) is written by the Initiative Owner and approved by the scoring panel and executive sponsor before any calendar placement or build/buy work begins. A completed, approved PRD with the conditional Compact is the single artifact that certifies an initiative is ready to advance.
 
@@ -170,44 +174,47 @@ The Initiative Owner writes the PRD. It is not a committee document — one pers
 ### PRD Sections
 
 **1. Initiative Summary**
-What is this initiative, and what problem does it solve? One paragraph. Includes the initiative name, a plain-language description of what it does, and which path it takes: Build or Buy.
+What is this initiative, and what problem does it solve? One paragraph plain-language description, plus the **Business Rationale** — the explicit "why this matters" articulation, including what changes if the initiative is *not* done. Includes the named Initiative Owner and Executive Sponsor.
 
-**2. Target Users**
-Who will use this solution, and in what context? Define the specific roles (e.g., AEs working enterprise accounts, SDRs running outbound sequences, frontline managers conducting pipeline reviews), the segments or teams in scope, and what part of their workflow this touches. Be specific — "the sales team" is not a target user definition.
+**2. Prioritization**
+Reference the CARET Priority Score and factor breakdown for traceability — so anyone reviewing the PRD later understands why this initiative was prioritized. The score itself is set in Stage 1; this section just surfaces it.
 
-**3. Business Need and CARET Context**
-What business need is this addressing? Reference the Level 3 metric (Impact) that this initiative is expected to move. Include the CARET Priority Score and factor breakdown for traceability — so anyone reviewing the PRD later understands why this initiative was prioritized.
+**3. Audiences Served**
+Who will use this solution, and in what context? Define both the **primary audiences** (built for first) and any **secondary audiences** (benefit indirectly or in a later wave). Be specific — "the sales team" is not a target user definition. Use named roles and segments.
 
-**4. Success Metrics — All Three Layers**
-The specific metrics that will be tracked during the pilot and GA, defined at all three levels: Level 1 (Behavior), Level 2 (Indicators), Level 3 (Impact). Include the baseline value for each metric — captured before the pilot begins — and the target improvement the initiative is expected to produce.
+**4. GTM Motions**
+Which motions from the AI GTM Motions Taxonomy does this initiative touch? Tag against the bowtie-aligned categories — Awareness, Education, Selection, Onboard, Impacting, Growth, plus Operational Foundations and Enablement Foundations. Used later to surface portfolio overlaps when initiatives target the same motion, and to anticipate cognitive-load risks when multiple in-flight initiatives change behaviors in adjacent motions.
 
-**5. Path: Build or Buy**
-Confirm the path and document the rationale. For Buy: name the vendor(s) under consideration and the evaluation criteria. For Build: identify the core technical components and architecture approach.
+**5. Usage Frequency**
+How often will primary and secondary audiences use this? Daily / Weekly / Monthly / Quarterly per audience tier. Drives the change-management estimation in the Effort score and informs Calendar-stage cognitive-load planning.
 
-**6. Systems and Integrations**
-Every system this initiative will touch, read from, write to, or sit alongside. For each: integration type (read-only, read-write, bidirectional), internal system owner, and whether API access is established or needs to be provisioned.
+**6. Success Metrics — All Three Layers**
+The specific metrics that will be tracked during the pilot and GA, defined at all three levels: Level 1 (Behavior), Level 2 (Indicators), Level 3 (Impact). Each metric carries its own tracking **cadence** (daily / weekly / monthly / quarterly) and tracking mechanism. Include the baseline value for each metric — captured before the pilot begins — and the target improvement the initiative is expected to produce. Cadence should reflect how quickly each metric naturally moves: Level 1 typically weekly, Level 2 typically monthly, Level 3 typically quarterly.
 
-**7. Data Architecture**
+**7. Path: Build or Buy**
+Confirm the path and document the rationale. For Buy: name the primary vendor, the broader evaluation list, and the evaluation criteria. For Build: identify the core technical components and architecture approach.
+
+**8. Systems and Integrations**
+Every system this initiative will touch, read from, write to, or sit alongside in ongoing operations. For each: integration type (read-only, read-write, bidirectional), internal system owner, and whether API access is established or needs to be provisioned.
+
+**9. Data Architecture**
 For each data type the solution handles — inputs consumed, outputs generated, intermediate states — document the storage location, the owner, and what happens to that data if the solution is wound down. For Buy: document vendor data retention policies and what data leaves the organization's environment.
 
-**8. Risk Assessment**
-Assessment of the initiative against each risk category, with a disposition (accept / mitigate / escalate) for each. Risk categories: New UI or Login Requirement, Overlapping Capabilities, Data Quality and Completeness, Integration Fragility, Vendor Lock-In (Buy only). See Stage 4 (Deploy) for full definitions of each risk category.
+**10. Risk Assessment**
+Assessment of the initiative against each risk category, with a disposition (accept / mitigate / escalate / not applicable) for each. Risk categories: New UI or Login Requirement, Overlapping Capabilities, Data Quality and Completeness, Integration Fragility, Vendor Lock-In (Buy only). See Stage 4 (Deploy) for full definitions of each risk category.
 
-**9. Pilot Plan**
-Pilot scope (which team, which segment), cohort selection rationale (based on behavior gap), timeline, intervention design approach (what type of intervention and why), and the decision criteria for each gate outcome (Scale / Fix and Re-Pilot / Kill).
+**11. Pilot Plan**
+Pilot scope (which team, which segment), cohort selection rationale (based on behavior gap), timeline, intervention design approach, and the explicit decision criteria for each Stage 5 gate outcome — **Proceed to GA** / **Fix and Re-Pilot** / **Kill**.
 
-**10. Workstream Assignments**
+**12. Workstream Assignments**
 Named owners and target dates for each essential workstream. Roles should be confirmed at PRD approval; names may be TBD for workstreams that depend on scope finalization. See Stage 4 (Deploy) for the full workstream list by path (Build vs. Buy).
 
-**11. Measurement Cadence**
-For each success metric at all three layers, specify the tracking cadence (daily, weekly, monthly, quarterly) and the mechanism for capturing it. This section must be completed before Stage 4 begins so that measurement infrastructure is built early — not assembled at the gate. The cadence for each metric should reflect how quickly that metric naturally moves: Level 1 (Behavior) typically weekly, Level 2 (Indicators) typically monthly, Level 3 (Impact) typically quarterly.
-
-**12. Approval Mechanism**
+**13. Approval Mechanism**
 How will this PRD be approved? The Initiative Owner specifies the approval process — a formal committee meeting, a Slack channel vote, an email sign-off, or another mechanism — and names who is required to approve. This section ensures the approval process is agreed upon before the PRD is circulated, not improvised after.
 
 ---
 
-**13. The Accountability Compact**
+**14. The Accountability Compact**
 
 *This is the most consequential section of the PRD. It must not be treated as boilerplate.*
 
@@ -239,7 +246,7 @@ During the first 90 days of GA, the executive sponsor participates in at least [
 
 The Initiative Owner presents the compact to the executive sponsor with a direct ask:
 
-*"If the pilot succeeds and we make a Scale decision, will you commit to these specific terms?"*
+*"If the pilot succeeds and we make a Proceed-to-GA decision, will you commit to these specific terms?"*
 
 - **Yes** → Document the conditional agreement. The PRD is ready for final approval.
 - **Conditional yes with modifications** → Negotiate the specific terms. Document the revised version. Proceed only if the revised compact still includes meaningful accountability for the manager coaching cadence — that commitment is non-negotiable.
@@ -247,7 +254,7 @@ The Initiative Owner presents the compact to the executive sponsor with a direct
 
 ### PRD Approval
 
-The Initiative Owner drives the approval process using the mechanism specified in Section 12. The PRD requires sign-off from two parties before Stage 3 (Calendar) begins:
+The Initiative Owner drives the approval process using the mechanism specified in Section 13. The PRD requires sign-off from two parties before Stage 3 (Calendar) begins:
 
 1. **Scoring Panel** — all sections are complete, internally consistent, and the initiative is well enough understood to proceed
 2. **Executive sponsor conditional sign-off on the Accountability Compact** — the specific terms have been reviewed and conditionally agreed to
@@ -261,8 +268,8 @@ Both approvals are documented. The signed PRD (with the conditional Accountabili
 An initiative cannot advance to Stage 3 (Calendar) until all of the following are true:
 
 - [ ] **Initiative Owner named** — a specific person is accountable for shepherding this initiative from PRD through GA
-- [ ] **All 13 PRD sections complete** — the PRD is internally consistent and reviewed by the scoring panel
-- [ ] **Scoring panel approved the PRD** — using the mechanism documented in Section 12
+- [ ] **All 14 PRD sections complete** — the PRD is internally consistent and reviewed by the scoring panel
+- [ ] **Scoring panel approved the PRD** — using the mechanism documented in Section 13
 - [ ] **Executive sponsor conditionally signed the Accountability Compact** — the specific four terms have been reviewed and conditionally agreed to
 - [ ] **Resources allocated** — build capacity committed, enablement lead assigned, budget approved
 
@@ -341,7 +348,7 @@ Evaluate what it would take to migrate off this vendor if needed: data portabili
 
 ### Workstream Assignments
 
-The workstream assignments were seeded in PRD Section 10 before Stage 4 began. At the start of Stage 4, the Initiative Owner confirms named owners and finalizes target dates. Every workstream needs one person who is accountable for it — not a team, a person. Unassigned workstreams are the primary cause of initiative stall.
+The workstream assignments were seeded in PRD Section 12 before Stage 4 began. At the start of Stage 4, the Initiative Owner confirms named owners and finalizes target dates. Every workstream needs one person who is accountable for it — not a team, a person. Unassigned workstreams are the primary cause of initiative stall.
 
 **Build Path Workstreams**
 
@@ -375,7 +382,7 @@ Throughout Stage 4, the Initiative Owner monitors for scope creep. On the Build 
 An initiative cannot advance to Pilot until all of the following are true:
 
 - [ ] **Solution is functional and internally tested** — the build works as specified; known bugs are documented and triaged
-- [ ] **Measurement cadence is established at all three layers** — this is not a one-time data capture. Baselining means building the mechanism to track each metric on its natural cadence (daily, weekly, monthly, or quarterly) before the pilot begins, so that pilot results reflect real before/after movement rather than a point-in-time estimate. This work should begin as early as possible in Stage 4 — not scrambled at the gate. For Level 1 (Behavior) metrics, weekly tracking is typically sufficient. For Level 2 (Indicators), monthly. For Level 3 (Impact), quarterly. The cadence for each metric should be specified in PRD Section 11 and the tracking mechanism confirmed operational before advancing.
+- [ ] **Measurement cadence is established at all three layers** — this is not a one-time data capture. Baselining means building the mechanism to track each metric on its natural cadence (daily, weekly, monthly, or quarterly) before the pilot begins, so that pilot results reflect real before/after movement rather than a point-in-time estimate. This work should begin as early as possible in Stage 4 — not scrambled at the gate. For Level 1 (Behavior) metrics, weekly tracking is typically sufficient. For Level 2 (Indicators), monthly. For Level 3 (Impact), quarterly. The cadence for each metric is captured in PRD Section 6 alongside the metric definition; confirm the tracking mechanism is operational before advancing.
 - [ ] **Test cohort is identified and prepared** — specific reps or teams are confirmed, have been briefed on participation, and understand the pilot timeline and expectations
 - [ ] **Rollback criteria are defined** — the team has agreed in advance on what would trigger a pause or rollback (e.g., adoption below X%, negative rep feedback above Y threshold, data quality issues)
 - [ ] **Enablement brief is drafted** — a concise document that tells reps what the tool does, how to use it in their workflow, and what "good" looks like; this is the input for pilot onboarding
@@ -399,7 +406,7 @@ Design the intervention starting at the lowest-effort mechanism that could plaus
 
 When training is required, design it around the full workflow — not the tool in isolation. Don't train reps on "here's how to use [AI tool]." Train them on the specific sales motion the tool supports: What's the talk track? What's the click path? How does the rep transition between tools before, during, and after the interaction? What content will they share, and how do they access it? A rep who understands the tool but not the workflow it lives in will use it inconsistently or not at all.
 
-**Success Metrics — Three Layers:** Measure at all three levels throughout the pilot. Level 1 (Behavior) metrics are your early warning system — if rep behavior isn't changing in the first two weeks, Level 3 will never move, and you have enough signal to intervene before the pilot ends. Level 2 (Indicators) metrics confirm that behavior change is translating into account and opportunity health improvements. Level 3 (Impact) metrics are the go/no-go anchor for the Scale decision, but they require enough elapsed time to be meaningful — let the metric drive the pilot timeline, not the calendar. The gate decision hinges on Level 3, but the diagnostic work hinges on the full three-layer picture.
+**Success Metrics — Three Layers:** Measure at all three levels throughout the pilot. Level 1 (Behavior) metrics are your early warning system — if rep behavior isn't changing in the first two weeks, Level 3 will never move, and you have enough signal to intervene before the pilot ends. Level 2 (Indicators) metrics confirm that behavior change is translating into account and opportunity health improvements. Level 3 (Impact) metrics are the go/no-go anchor for the Proceed-to-GA decision, but they require enough elapsed time to be meaningful — let the metric drive the pilot timeline, not the calendar. The gate decision hinges on Level 3, but the diagnostic work hinges on the full three-layer picture.
 
 **Reinforcement During Pilot:** The executive sponsor and frontline managers actively reinforce usage during the pilot period. A pilot that isn't managed like a real initiative produces data about abandonment, not about the tool.
 
@@ -411,28 +418,28 @@ When training is required, design it around the full workflow — not the tool i
 
 An initiative cannot advance to GA until the panel has made an explicit decision across three possible outcomes:
 
-**Scale:** The pilot hit (or materially exceeded) the success metric. Enablement is ready. Proceed to GA.
+**Proceed to GA:** The pilot hit (or materially exceeded) the success metric. Enablement is ready. Roll out to the full population.
 
 **Fix and Re-Pilot:** The pilot revealed a specific, correctable problem. The issue is documented, a fix is scoped, and a second pilot is scheduled. Do not advance to GA on optimism.
 
 **Kill:** The initiative did not produce the expected value and the path to fixing it is unclear or disproportionately expensive. Return the initiative to the queue at a lower priority or retire it. A kill decision is not a failure — it is the framework working correctly.
 
-If the panel chooses Scale, the following must also be true before GA begins:
+If the panel chooses Proceed to GA, the following must also be true before GA begins:
 
 - [ ] **Enablement team is ready to onboard the full population** — training materials, manager briefs, and reinforcement plan are finalized
 - [ ] **Measurement dashboard is built** — GA-state metrics will be tracked in a live dashboard from day one, not reconstructed after the fact
 - [ ] **Ownership continuity confirmed** — the Initiative Owner either commits to continuing ownership through GA or formally hands off to a named successor who accepts accountability for adoption, measurement, and ongoing optimization
-- [ ] **Accountability Compact is executed** — the conditional commitment captured in PRD Section 13 is converted into a signed agreement; see below
+- [ ] **Accountability Compact is executed** — the conditional commitment captured in PRD Section 14 is converted into a signed agreement; see below
 
 ---
 
 ## The Accountability Compact: Execution
 
-*This step occurs between Stages 5 and 6 — after the Scale decision is made, before GA launches.*
+*This step occurs between Stages 5 and 6 — after the Proceed-to-GA decision is made, before GA launches.*
 
 ### What Happens Here
 
-The pilot hit the success metrics. The Scale decision has been made. Now the conditional commitment the executive sponsor made in PRD Section 13 becomes a binding agreement.
+The pilot hit the success metrics. The Proceed-to-GA decision has been made. Now the conditional commitment the executive sponsor made in PRD Section 14 becomes a binding agreement.
 
 This is not a renegotiation. The exec reviewed and conditionally agreed to the specific terms months ago. The Initiative Owner returns with the same document and a simple ask: *"The pilot succeeded. These are the terms you agreed to. Let's execute."*
 
@@ -442,7 +449,7 @@ If the executive sponsor is now reluctant to sign — despite having conditional
 
 Before GA launch date is set, all of the following must be documented and confirmed:
 
-- [ ] **Compact is signed** — the executive sponsor has formally committed to the four accountability terms agreed to in PRD Section 13
+- [ ] **Compact is signed** — the executive sponsor has formally committed to the four accountability terms agreed to in PRD Section 14
 - [ ] **Frontline managers are briefed** — each in-scope manager has been individually briefed on their specific obligations: coaching cadence, metrics they'll be reviewing, and the dashboard they'll use
 - [ ] **Coaching cadence is calendared** — dedicated coaching sessions (separate from deal reviews) are on the calendar before GA day one
 - [ ] **Exec communication is drafted and scheduled** — the expectation-setting message from leadership to reps and managers is written and has a confirmed delivery date before or at GA launch
@@ -519,13 +526,13 @@ The quarterly roadmap review incorporates GA performance data: are live initiati
 |---|---|---|
 | **1 — Prioritize** | Score initiatives with CARET; sequence by priority | — |
 | **Stage 1 Exit Criteria** | Confirm queue is ready for detailed planning | Panel scored independently; divergences resolved; queue agreed and documented |
-| **2 — PRD** | Document path, success metrics, pilot plan, risks, workstreams, and the conditional Accountability Compact | — |
-| **Stage 2 Exit Criteria** | Confirm initiative is ready to be scheduled and resourced | Initiative Owner named; 13 PRD sections complete; scoring panel approved; exec sponsor conditionally signed Compact; resources allocated |
+| **2 — PRD** | Document business rationale, audiences, GTM motions, success metrics, pilot plan, risks, workstreams, and the conditional Accountability Compact | — |
+| **Stage 2 Exit Criteria** | Confirm initiative is ready to be scheduled and resourced | Initiative Owner named; 14 PRD sections complete; scoring panel approved; exec sponsor conditionally signed Compact; resources allocated |
 | **3 — Calendar** | Place initiatives on Gantt; apply cognitive load constraint | — |
 | **Stage 3 Exit Criteria** | Confirm timeline is realistic against portfolio capacity | Placed on calendar; cumulative cognitive load verified; no blackout-window conflicts |
 | **4 — Deploy** | Build or buy the solution to pilot-ready state | — |
 | **Stage 4 Exit Criteria** | Confirm solution is ready for controlled pilot | Functional build; measurement cadence operational; cohort prepared; rollback criteria set; enablement brief drafted; PRD revised |
-| **5 — Pilot** | Test with controlled cohort; make Scale/Fix/Kill decision | — |
-| **Stage 5 Exit Criteria** | Confirm Scale decision and GA readiness | Scale decision made; enablement ready; dashboard built; ownership continuity confirmed; Accountability Compact executed |
+| **5 — Pilot** | Test with controlled cohort; make Proceed-to-GA / Fix / Kill decision | — |
+| **Stage 5 Exit Criteria** | Confirm Proceed-to-GA decision and GA readiness | Proceed-to-GA decision made; enablement ready; dashboard built; ownership continuity confirmed; Accountability Compact executed |
 | **Accountability Compact: Execution** | Convert conditional leadership commitment to binding agreement | Compact signed; managers briefed; coaching cadence calendared; exec communication scheduled |
 | **6 — GA** | Drive durable adoption; close feedback loop | Reinforcement hierarchy deployed; 90-day arc managed; decay monitoring active; learnings fed to Stage 1 |

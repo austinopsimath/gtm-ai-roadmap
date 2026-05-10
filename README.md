@@ -1,6 +1,6 @@
 # GTM AI Roadmap Management
 
-**Live app:** https://gtm-ai-roadmap.netlify.app/
+**Live app:** https://gtm-ai-roadmap.jerry-0de.workers.dev/
 
 An interactive companion to the **GTM AI Roadmap Management** framework — a structured operating system for selecting, sequencing, building, piloting, and embedding GTM AI initiatives.
 
@@ -10,12 +10,12 @@ The framework itself lives at [GTM_AI_Roadmap_Framework.md](GTM_AI_Roadmap_Frame
 
 A free, browser-based tool for GTM leaders and operators to:
 
-- Maintain an Initiative Registry across the full portfolio
-- Score initiatives with the CARET methodology (Complexity, Alignment, Results, Effort, Timeline)
-- Visualize the roadmap with cumulative cognitive load constraints
-- Author the GTM AI Initiative PRD with all 13 sections
-- Capture the Accountability Compact at both gate moments (conditional and executed)
-- Track the 90-day GA reinforcement arc
+- Maintain an **Initiative Registry** across the full portfolio
+- Score initiatives with the **CARET methodology** (Complexity, Alignment, Results, Effort, Timeline) — multi-stakeholder panel scoring with divergence detection
+- Author the **14-section PRD** as the framework's gate artifact, including the conditional Accountability Compact (Section 14)
+- Tag initiatives against the **AI GTM Motions Taxonomy** to surface portfolio overlaps and cognitive-load risks
+- Visualize the **portfolio Roadmap (Gantt)** with cumulative cognitive load constraints
+- Walk through the **CARET scoring ceremony**, **Compact execution**, and **90-day GA reinforcement arc** as ceremonies — not free-form notes
 
 ## What it isn't
 
@@ -29,19 +29,21 @@ Everything you enter is stored locally in the browser you're using. We have no w
 
 ## Self-hosting
 
-Because the app is purely static, anyone can fork this repo and host their own copy on Netlify, Cloudflare Pages, Vercel, or any static host. No backend setup required.
+Because the app is purely static, anyone can fork this repo and host their own copy on Cloudflare Pages, Netlify, Vercel, or any static host. No backend setup required.
 
 ## Tech stack
 
-- Vite + React + TypeScript
+- Vite 6 + React 18 + TypeScript
 - Tailwind CSS v4
 - Zustand (with `persist` middleware) for state
-- React Router for navigation
-- Hosted on Netlify, deployed automatically on every push to `main`
+- React Router 6 for navigation
+- Hosted on Cloudflare Pages (Workers + Static Assets), deployed automatically on every push to `main`
 
 ## Status
 
-Early development. The framework is finalized; the app is being built phase by phase. See [BUILD_PLAN.md](BUILD_PLAN.md) for the roadmap.
+Phases 0–4a shipped. PRD Builder (14-section auto-saving form with the AI GTM Motions Taxonomy and Conditional Accountability Compact) is fully usable. See [BUILD_PLAN.md](BUILD_PLAN.md) for what's built and what's planned.
+
+Currently up next: Phase 4b printable PRD view, then Phase 5 (Compact execution ceremony), Phase 6 (GA tracking), Phase 7 (PWA polish), Phase 8 (custom-domain launch).
 
 ## License
 

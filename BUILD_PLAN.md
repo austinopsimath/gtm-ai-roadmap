@@ -2,6 +2,8 @@
 
 A static, free-to-use, browser-persisted PWA that operationalizes the framework defined in [GTM_AI_Roadmap_Framework.md](GTM_AI_Roadmap_Framework.md).
 
+**Live:** https://gtm-ai-roadmap.jerry-0de.workers.dev/
+
 ---
 
 ## Locked Decisions
@@ -9,29 +11,29 @@ A static, free-to-use, browser-persisted PWA that operationalizes the framework 
 | Decision | Choice |
 |---|---|
 | **App name** | GTM AI Roadmap Management |
-| **Repo slug** | `gtm-ai-roadmap` |
-| **Code location** | This folder: `/Users/jerrypharr/.../AI Agents/AI Roadmap Management/` (Google Drive synced — see "Drive sync caveat" below) |
-| **Hosting** | Netlify (free tier, GitHub auto-deploy) |
-| **Domain plan** | Free `*.netlify.app` URL initially → CNAME `roadmap.salesexcellence.xyz` to Netlify in Phase 8 |
+| **Repo** | https://github.com/austinopsimath/gtm-ai-roadmap (public) |
+| **Code location** | `/Users/jerrypharr/.../AI Agents/AI Roadmap Management/` (Google Drive synced) |
+| **Hosting** | Cloudflare Pages (Workers + Static Assets), free tier |
+| **Domain plan** | Currently on `*.workers.dev` Cloudflare default. Pending: CNAME `roadmap.salesexcellence.xyz` → Cloudflare in Phase 8 |
 | **Repo visibility** | Public on GitHub |
 | **Build cadence** | Claude drives; checkpoint at each phase boundary and on non-trivial mid-phase design calls |
-| **Visual style** | Clean and minimal — Inter or system font, neutral palette with one accent color, generous whitespace, Vercel-dashboard influence. Refine in Phase 1+ once real screens exist. |
+| **Visual style** | Clean and minimal — Inter / system font, neutral palette with one accent color, generous whitespace |
 
-### Drive Sync Caveat
+### Hosting history
 
-The project lives inside a Google Drive synced folder. `node_modules/` and `dist/` will exist locally but should be excluded from Drive sync (via the Drive for Desktop client's selective sync settings) to avoid quota burn and slow installs. They're already gitignored. If Drive sync becomes painful in practice, escape hatch: move the code outside Drive (e.g., `~/Desktop/gtm-ai-roadmap/`) and keep the framework markdown + build plan here.
+We started on Netlify free tier (300 credits/month, 15 credits per production deploy = ~20 deploys/month). Hit the credit ceiling around Phase 3 polish. Migrated to Cloudflare Pages for its 500-builds/month free tier with no bandwidth caps and no commercial-use TOS restrictions. The Netlify deployment is now retired.
 
 ---
 
 ## Architecture
 
-- **Stack:** Vite + React + TypeScript + Tailwind CSS
+- **Stack:** Vite 6 + React 18 + TypeScript + Tailwind CSS v4
 - **State:** Zustand with `persist` middleware → automatic `localStorage` sync
 - **Persistence model:** Browser-only `localStorage`. No backend, no accounts, no analytics, no PII collection.
 - **Backup pattern:** Auto-save on every change + JSON export/import + "last backed up" indicator + periodic backup nudges
-- **Print/export:** `window.print()` with print-specific stylesheets for PRD and Accountability Compact PDF generation (no PDF library needed)
-- **PWA:** `manifest.json` + minimal service worker for offline use and install-to-home-screen
-- **Hosting:** Netlify, auto-deployed from GitHub `main` branch
+- **Print/export:** `window.print()` with print-specific stylesheets (planned for Phase 4b PRD viewer)
+- **Routing:** React Router 6 with URL-driven state for `viewedStage` (`?stage=`) and Roadmap "from" tracking (`?from=`)
+- **Hosting:** Cloudflare Pages, auto-deployed from GitHub `main` branch via Wrangler
 - **No environment variables, no secrets, no server-side anything.** Truly zero ops.
 
 ---
@@ -40,79 +42,93 @@ The project lives inside a Google Drive synced folder. `node_modules/` and `dist
 
 **Detail page + ceremony wizards** — not a single end-to-end wizard.
 
-- **Day-to-day editing** happens on a per-initiative detail page with collapsible/tabbed sections; all sections editable in any order; gate checklist sidebar shows what's needed to advance
+- **Day-to-day editing** happens on a per-initiative detail page with a stage-aware lifecycle section (clickable progress bar, contextual checklist, inline editors per stage) plus a separate "Profile" section for static reference data
 - **Ceremony wizards** trigger only at meaningful moments:
-  - New initiative intake (name, description, CARET scoring → priority score reveal)
+  - New initiative intake (name, description, business rationale, ownership)
+  - CARET scoring (Roster + per-factor panel scoring with divergence detection)
   - Stage transition gate reviews
-  - Pilot decision (Scale / Fix and Re-Pilot / Kill)
-  - Accountability Compact signing (conditional and executed versions)
-
-This mirrors Linear/Notion/Asana — focused capture for new items, free-form detail page for ongoing work.
+  - Pilot decision (Proceed to GA / Fix and Re-Pilot / Kill) — Phase 6
+  - Accountability Compact execution (Stage 5→6 ceremony) — Phase 5
+- **PRD form** is its own dedicated route at `/initiatives/:id/prd` — 14 collapsible sections with a sticky table-of-contents sidebar showing per-section completion
 
 ---
 
 ## Phasing
 
-Each phase is independently shippable. Could realistically launch after Phase 4 and add the rest based on real user feedback.
+Each phase is independently shippable. Already shipped → ✅. Planned → ☐.
 
-### Phase 0 — Foundations
-- Local repo at `~/Desktop/gtm-ai-roadmap/`
+### Phase 0 — Foundations ✅
 - Vite + React + TS + Tailwind scaffolded
 - Zustand + persist set up
 - Routing skeleton
 - GitHub repo created (public)
-- Netlify connected, auto-deploy from `main`
-- Empty shell deployed and verified live at the `*.netlify.app` URL
+- Initial deployment (started on Netlify, migrated to Cloudflare Pages mid-phase 3)
 
-### Phase 1 — Initiative Registry + Persistence
+### Phase 1 — Initiative Registry + Persistence ✅
 - TypeScript data model for Initiative, CARET, PRD, Accountability Compact
-- Registry list view (the dashboard)
+- Registry list view (Dashboard)
 - Add / edit / delete initiative
 - Filter by stage, owner, sponsor, health
-- JSON export ("Download backup")
-- JSON import (drag-drop or file picker)
-- "Last backed up: X days ago" indicator + gentle nudges
+- JSON export / import for backup
+- "Last backed up" indicator with backup nudge banner
 
-### Phase 2 — CARET Scoring
-- Scoring form with each factor (C, A, R, E, T) and explainer copy
-- Live Priority Score calculation
-- Stage tracker on each initiative
-- New initiative intake wizard (the first "ceremony")
+### Phase 2 — CARET Scoring ✅
+- Multi-step ceremony wizard at `/initiatives/:id/score`
+- Per-factor explainer content lifted directly from the framework
+- Panel roster with multi-stakeholder scoring per factor
+- Divergence detection (≥ 2 points) with required discussion notes
+- Per-factor "N/A" sentinel for stakeholders outside their domain
+- Live priority score reveal on the review step
+- CARET breakdown with panelist breakdown surfaced on the Stage 1 lifecycle view
 
-### Phase 3 — Roadmap / Gantt View
-- Timeline visualization showing initiatives across time
-- Cumulative cognitive load meter (Effort sum vs. ~10 ceiling)
-- Drag-to-reschedule
-- Pilot window markers
+### Phase 3 — Calendar + Portfolio Roadmap ✅
+- **Phase 3a:** per-initiative timeline editor in Stage 3 (Calendar) lifecycle view with Deploy/Pilot/GA dates and date-order validation
+- **Phase 3b:** portfolio Gantt at `/roadmap` with three colored bars per initiative, cumulative cognitive load lane (Effort summed for initiatives in Pilot or GA's first 90 days), today indicator, stage filter
+- Lifecycle progress bar made clickable for cross-stage navigation
+- URL-driven `viewedStage` so browser back works
+- Inline path/vendor editor in Stage 2 PRD view (later moved when PRD became its own stage)
 
-### Phase 4 — PRD Builder
-- Guided form covering all 13 PRD sections per initiative
-- Live preview pane
-- Print-to-PDF via `window.print()` with PRD-specific stylesheet
-- Section completion indicators tied to gate checklist
+### Phase 4a — PRD Builder ✅
+- 14-section PRD form at `/initiatives/:id/prd` with auto-save
+- Sticky sidebar table of contents with per-section completion checks
+- Sections collapsed by default; click headers (or sidebar) to open; Expand all / Collapse all
+- Auto-derives completion for sections that map to existing initiative profile data
+- New profile fields: Business Rationale, Primary / Secondary Audiences, Usage Frequency, GTM Motions
+- AI GTM Motions Taxonomy: ~150 motions across 8 categories (Awareness, Education, Selection, Onboard, Impacting, Growth, Operational Foundations, Enablement Foundations) with custom MotionsPicker component (collapsible categories, search across all, chips for selected)
+- Level 1 / Level 2 metric picklists (in addition to Level 3)
+- Risk Assessment with four dispositions (accept / mitigate / escalate / not applicable)
+- Pilot Plan decision criteria labeled **Proceed to GA** / Fix and Re-Pilot / Kill
+- Workstream pre-population from framework's Build / Buy templates
+- Conditional Accountability Compact (Section 14): four commitment cards with editable [X] placeholders, conditional sign-off status, escalation callout when status is "No"
+- Lifecycle Stage 2 PRD checklist auto-checks all 14 sections via `isPRDSectionComplete()`
 
-### Phase 5 — Accountability Compact
-- Fillable conditional version (Stage 2→3)
-- Fillable executed version (Stage 4→5)
-- Printable signed-version output
-- Compact ceremony wizards
+### Phase 4b — Printable PRD View ☐
+- `/initiatives/:id/prd/view` read-only printable layout
+- Print stylesheet for `window.print()` → PDF export
 
-### Phase 6 — GA Tracking
-- 90-day phase indicators (Onboard / Reinforce / Embed)
+### Phase 5 — Accountability Compact: Execution ☐
+- Stage 5 → 6 gate ceremony at `/initiatives/:id/compact/execute`
+- Converts conditional Compact (PRD Section 14) to executed/binding state
+- Execution checklist: signed, managers briefed, coaching cadence calendared, exec communication scheduled, accountability check-in dates set
+- Wire into Stage 5 Exit Criteria checklist
+
+### Phase 6 — GA Tracking ☐
+- 90-day reinforcement arc tracker (Days 1–30 Onboard / 31–60 Reinforce / 61–90 Embed)
+- Manager Decoder Ring per behavior metric
 - Decay signal monitoring on Level 1 metrics
-- Decoder ring per metric
-- Manager coaching cadence tracker
+- Coaching cadence compliance dashboard
 
-### Phase 7 — Polish + PWA
-- Landing page at `/` with framework intro, "Launch the app" CTA, privacy section, link to framework doc
+### Phase 7 — Polish + PWA ☐
+- Landing page at `/` (separate from app dashboard)
 - PWA manifest + service worker
-- First-visit onboarding
+- First-visit onboarding flow
 - Empty states throughout
 - Privacy footer
 - Responsive design pass
+- Code-split the GTM Motions taxonomy (lazy-load when entering PRD)
 
-### Phase 8 — Launch
-- CNAME `roadmap.salesexcellence.xyz` → Netlify
+### Phase 8 — Launch ☐
+- CNAME `roadmap.salesexcellence.xyz` → Cloudflare
 - Final QA pass
 - Distribution: LinkedIn post, newsletter, share with network
 
@@ -125,12 +141,9 @@ Each phase is independently shippable. Could realistically launch after Phase 4 
 | Framework markdown (source of truth for the methodology) | This folder (also part of the public GitHub repo) |
 | Build plan (this file) | This folder (also part of the public GitHub repo) |
 | App code | This folder, with `node_modules/` and `dist/` excluded from Drive sync |
-| Deployed app | `*.netlify.app` initially; `roadmap.salesexcellence.xyz` after Phase 8 |
+| Deployed app | `gtm-ai-roadmap.jerry-0de.workers.dev` (Cloudflare). Pending: `roadmap.salesexcellence.xyz` after Phase 8 |
 | User data | Each user's browser `localStorage` only — never on any server |
 
----
+### Drive Sync Caveat
 
-## Open Questions
-
-- Confirm git repo layout: rooted at the AI Roadmap Management folder, including framework markdown + build plan in the public repo (recommended), or code-only in a subfolder
-- Confirm GitHub creation method: `gh` CLI (if authenticated) or manual via github.com
+The project lives inside a Google Drive synced folder. `node_modules/` and `dist/` exist locally but should be excluded from Drive sync (via the Drive for Desktop client's selective sync settings) to avoid quota burn and slow installs. They're already gitignored. If Drive sync becomes painful in practice, escape hatch: move the code outside Drive (e.g., `~/Desktop/gtm-ai-roadmap/`) and keep the framework markdown + build plan here.
