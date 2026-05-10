@@ -131,18 +131,19 @@ export function getStageInfo(
     case 'prd': {
       const sectionTitles: Record<string, string> = {
         '1': 'Initiative Summary',
-        '2': 'Target Users',
-        '3': 'Business Need + CARET Context',
-        '4': 'Success Metrics — All Three Layers',
-        '5': 'Path (Build vs. Buy)',
-        '6': 'Systems and Integrations',
-        '7': 'Data Architecture',
-        '8': 'Risk Assessment',
-        '9': 'Pilot Plan',
-        '10': 'Workstream Assignments',
-        '11': 'Measurement Cadence',
-        '12': 'Approval Mechanism',
-        '13': 'Conditional Accountability Compact',
+        '2': 'Prioritization',
+        '3': 'Audiences Served',
+        '4': 'GTM Motions',
+        '5': 'Usage Frequency',
+        '6': 'Success Metrics',
+        '7': 'Path (Build vs. Buy)',
+        '8': 'Systems and Integrations',
+        '9': 'Data Architecture',
+        '10': 'Risk Assessment',
+        '11': 'Pilot Plan',
+        '12': 'Workstream Assignments',
+        '13': 'Approval Mechanism',
+        '14': 'Conditional Accountability Compact',
       };
 
       const prdSections: LifecycleTask[] = Object.entries(sectionTitles).map(
@@ -170,14 +171,14 @@ export function getStageInfo(
           isComplete: prdApproved,
           hint: prdApproved
             ? undefined
-            : 'Set the approval status to "Approved" in PRD Section 12 once the panel signs off.',
+            : 'Set the approval status to "Approved" in PRD Section 13 once the panel signs off.',
         },
         {
           label: 'Executive sponsor conditionally signed the Compact',
           isComplete: compactSigned,
           hint: compactSigned
             ? undefined
-            : 'Capture the exec\'s conditional response in PRD Section 13.',
+            : "Capture the exec's conditional response in PRD Section 14.",
         },
         {
           label: 'Resources allocated (build capacity, enablement, budget)',
@@ -193,11 +194,9 @@ export function getStageInfo(
         isCurrent,
         isFuture,
         headline: 'Stage 2: PRD',
-        body: "The PRD — Product Requirements Document — is the framework's 13-section gate artifact. Written by the Initiative Owner, approved by the scoring panel, and conditionally signed by the executive sponsor (via Section 13, the Accountability Compact). A completed, approved PRD is what certifies an initiative is ready to be placed on the calendar and resourced for Deploy.",
+        body: "The PRD — Product Requirements Document — is the framework's 14-section gate artifact. Written by the Initiative Owner, approved by the scoring panel, and conditionally signed by the executive sponsor (via Section 14, the Accountability Compact). A completed, approved PRD is what certifies an initiative is ready to be placed on the calendar and resourced for Deploy.",
         tasks,
-        offlineNote: isCurrent
-          ? "The full PRD builder is coming in a future phase. For now, write Sections 4 and 7–13 offline using the framework markdown; Sections 1–3, 5, and 6 auto-check from the initiative profile and CARET scoring as you fill them in."
-          : undefined,
+        offlineNote: undefined,
         primaryAction: isCurrent
           ? {
               kind: 'advance',

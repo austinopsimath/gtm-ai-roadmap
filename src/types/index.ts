@@ -52,7 +52,14 @@ export interface MetricDef {
   trackingMechanism: string;
 }
 
-export type RiskDispositionType = 'accept' | 'mitigate' | 'escalate' | null;
+export type RiskDispositionType =
+  | 'accept'
+  | 'mitigate'
+  | 'escalate'
+  | 'not_applicable'
+  | null;
+
+export type UsageFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly';
 
 export interface RiskDisposition {
   disposition: RiskDispositionType;
@@ -184,13 +191,18 @@ export interface Initiative {
   id: string;
   name: string;
   description: string;
+  businessRationale: string;
   stage: Stage;
   health: Health;
   initiativeOwner: string;
   executiveSponsor: string;
   path: Path | null;
   primaryVendor: string;
-  audiencesServed: string[];
+  primaryAudiences: string[];
+  secondaryAudiences: string[];
+  usageFrequencyPrimary: UsageFrequency | null;
+  usageFrequencySecondary: UsageFrequency | null;
+  gtmMotions: string[];
   technologies: string[];
   systemsTouched: string[];
   caret: CARETScores;
@@ -315,13 +327,18 @@ export const createInitiative = (
     id: crypto.randomUUID(),
     name: partial.name,
     description: partial.description ?? '',
+    businessRationale: partial.businessRationale ?? '',
     stage: partial.stage ?? 'prioritize',
     health: partial.health ?? 'green',
     initiativeOwner: partial.initiativeOwner ?? '',
     executiveSponsor: partial.executiveSponsor ?? '',
     path: partial.path ?? null,
     primaryVendor: partial.primaryVendor ?? '',
-    audiencesServed: partial.audiencesServed ?? [],
+    primaryAudiences: partial.primaryAudiences ?? [],
+    secondaryAudiences: partial.secondaryAudiences ?? [],
+    usageFrequencyPrimary: partial.usageFrequencyPrimary ?? null,
+    usageFrequencySecondary: partial.usageFrequencySecondary ?? null,
+    gtmMotions: partial.gtmMotions ?? [],
     technologies: partial.technologies ?? [],
     systemsTouched: partial.systemsTouched ?? [],
     caret: partial.caret ?? emptyScores(),

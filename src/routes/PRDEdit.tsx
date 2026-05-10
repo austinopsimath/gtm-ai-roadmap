@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useRoadmapStore } from '../store';
 import {
@@ -14,6 +13,7 @@ import {
   type PRD,
   type Path,
   type RiskDispositionType,
+  type UsageFrequency,
   type Workstream,
 } from '../types';
 import {
@@ -27,6 +27,7 @@ import {
 import { frameworkWorkstreamsFor } from '../constants/workstreams';
 import { FACTOR_ORDER, FACTORS } from '../constants/caret';
 import Combobox from '../components/Combobox';
+import MotionsPicker from '../components/MotionsPicker';
 import { isPRDSectionComplete } from '../lib/prdProgress';
 
 const CADENCE_LABELS: Record<MetricCadence, string> = {
@@ -36,22 +37,36 @@ const CADENCE_LABELS: Record<MetricCadence, string> = {
   quarterly: 'Quarterly',
 };
 
+const FREQUENCY_LABELS: Record<UsageFrequency, string> = {
+  daily: 'Daily',
+  weekly: 'Weekly',
+  monthly: 'Monthly',
+  quarterly: 'Quarterly',
+};
+
+const LEVEL_DESCRIPTIONS: Record<MetricLevel, string> = {
+  1: 'Behavior — what customer-facing roles say, type, and click. The earliest leading indicator that something is or isn\'t working.',
+  2: 'Indicators — account and opportunity health metrics that connect rep behavior to business outcomes.',
+  3: 'Impact — executive-level business results. The metrics that appear in board prep and earnings calls.',
+};
+
 const dedupe = (arr: string[]) => Array.from(new Set(arr));
 
 const SECTIONS = [
   { id: '1', title: 'Initiative Summary' },
-  { id: '2', title: 'Target Users' },
-  { id: '3', title: 'Business Need + CARET' },
-  { id: '4', title: 'Success Metrics' },
-  { id: '5', title: 'Path: Build or Buy' },
-  { id: '6', title: 'Systems and Integrations' },
-  { id: '7', title: 'Data Architecture' },
-  { id: '8', title: 'Risk Assessment' },
-  { id: '9', title: 'Pilot Plan' },
-  { id: '10', title: 'Workstreams' },
-  { id: '11', title: 'Measurement Cadence' },
-  { id: '12', title: 'Approval Mechanism' },
-  { id: '13', title: 'Conditional Compact' },
+  { id: '2', title: 'Prioritization' },
+  { id: '3', title: 'Audiences Served' },
+  { id: '4', title: 'GTM Motions' },
+  { id: '5', title: 'Usage Frequency' },
+  { id: '6', title: 'Success Metrics' },
+  { id: '7', title: 'Path: Build or Buy' },
+  { id: '8', title: 'Systems and Integrations' },
+  { id: '9', title: 'Data Architecture' },
+  { id: '10', title: 'Risk Assessment' },
+  { id: '11', title: 'Pilot Plan' },
+  { id: '12', title: 'Workstreams' },
+  { id: '13', title: 'Approval Mechanism' },
+  { id: '14', title: 'Conditional Compact' },
 ];
 
 export default function PRDEdit() {
@@ -124,14 +139,22 @@ export default function PRDEdit() {
             initiative={initiative}
             updateField={updateField}
           />
-          <Section2
+          <Section2 initiative={initiative} />
+          <Section3
             initiative={initiative}
             updateField={updateField}
             customAudiences={customAudiences}
             addCustomOption={addCustomOption}
           />
-          <Section3 initiative={initiative} updateField={updateField} />
           <Section4
+            initiative={initiative}
+            updateField={updateField}
+          />
+          <Section5
+            initiative={initiative}
+            updateField={updateField}
+          />
+          <Section6
             initiative={initiative}
             updatePrd={updatePrd}
             customLevel1Metrics={customLevel1Metrics}
@@ -139,25 +162,25 @@ export default function PRDEdit() {
             customLevel3Metrics={customLevel3Metrics}
             addCustomOption={addCustomOption}
           />
-          <Section5
+          <Section7
             initiative={initiative}
             updateField={updateField}
+            updatePrd={updatePrd}
             customTechnologies={customTechnologies}
             addCustomOption={addCustomOption}
           />
-          <Section6
+          <Section8
             initiative={initiative}
             updateField={updateField}
             customSystems={customSystems}
             addCustomOption={addCustomOption}
           />
-          <Section7 initiative={initiative} updatePrd={updatePrd} />
-          <Section8 initiative={initiative} updatePrd={updatePrd} />
           <Section9 initiative={initiative} updatePrd={updatePrd} />
           <Section10 initiative={initiative} updatePrd={updatePrd} />
-          <Section11 initiative={initiative} />
+          <Section11 initiative={initiative} updatePrd={updatePrd} />
           <Section12 initiative={initiative} updatePrd={updatePrd} />
           <Section13 initiative={initiative} updatePrd={updatePrd} />
+          <Section14 initiative={initiative} updatePrd={updatePrd} />
         </main>
       </div>
     </div>
@@ -289,7 +312,7 @@ function Section1({
     <SectionWrapper
       id="1"
       title="Initiative Summary"
-      subtitle="What is this initiative, and what problem does it solve? Captures name, description, and ownership from the initiative profile."
+      subtitle="Name, description, business rationale, and ownership."
       fromProfile
     >
       <Field label="Name">
@@ -306,6 +329,17 @@ function Section1({
           onChange={(e) => updateField('description', e.target.value)}
           rows={3}
           placeholder="One-sentence plain-language summary of what it does."
+          className={inputClass}
+        />
+      </Field>
+      <Field
+        label="Business rationale"
+        hint="Why is this important? What changes if we don't do it?"
+      >
+        <textarea
+          value={initiative.businessRationale}
+          onChange={(e) => updateField('businessRationale', e.target.value)}
+          rows={3}
           className={inputClass}
         />
       </Field>
@@ -331,8 +365,65 @@ function Section1({
   );
 }
 
-// Section 2: Target Users (from profile)
-function Section2({
+// Section 2: Prioritization (CARET only, from scoring)
+function Section2({ initiative }: { initiative: Initiative }) {
+  const score = calculatePriorityScore(initiative.caret);
+  return (
+    <SectionWrapper
+      id="2"
+      title="Prioritization"
+      subtitle="The CARET scores from the panel and the resulting Priority Score. Set in Stage 1."
+    >
+      <div>
+        <div className="text-sm font-medium text-gray-700">
+          CARET Priority Score
+        </div>
+        <div className="mt-1 font-mono text-2xl font-semibold text-gray-900">
+          {score === null ? (
+            <span className="text-gray-400">Not yet scored</span>
+          ) : (
+            score.toFixed(2)
+          )}
+        </div>
+        <div className="mt-1 text-xs text-gray-500">(A × R) / (C × E) × T</div>
+      </div>
+      <div>
+        <div className="mb-2 text-sm font-medium text-gray-700">
+          CARET breakdown
+        </div>
+        <div className="grid grid-cols-5 gap-2">
+          {FACTOR_ORDER.map((f) => (
+            <div
+              key={f}
+              className="rounded-md bg-gray-50 px-3 py-3 text-center"
+            >
+              <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                {FACTORS[f].letter}
+              </div>
+              <div className="mt-0.5 text-[11px] text-gray-600">
+                {FACTORS[f].name}
+              </div>
+              <div className="mt-1 font-mono text-lg font-semibold text-gray-900">
+                {initiative.caret[f] > 0
+                  ? formatNumber(initiative.caret[f])
+                  : '—'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {initiative.scoredBy && (
+        <div className="rounded-md bg-gray-50 px-3 py-2 text-sm">
+          <span className="font-medium text-gray-900">Scored by:</span>{' '}
+          <span className="text-gray-700">{initiative.scoredBy}</span>
+        </div>
+      )}
+    </SectionWrapper>
+  );
+}
+
+// Section 3: Audiences Served (from profile, primary + secondary)
+function Section3({
   initiative,
   updateField,
   customAudiences,
@@ -349,27 +440,35 @@ function Section2({
   const audienceOptions = dedupe([...DEFAULT_AUDIENCES, ...customAudiences]);
   return (
     <SectionWrapper
-      id="2"
-      title="Target Users"
-      subtitle='Who will use this solution, and in what context? Be specific — "the sales team" is not a target user definition.'
+      id="3"
+      title="Audiences Served"
+      subtitle="Who will use this solution? Capture both the primary audience (built for first) and any secondary audiences (benefit indirectly or in a later wave)."
       fromProfile
     >
       <Combobox
         mode="multi"
-        label="Audiences served"
+        label="Primary audiences"
         options={audienceOptions}
-        selected={initiative.audiencesServed}
-        onChange={(v) => updateField('audiencesServed', v)}
+        selected={initiative.primaryAudiences}
+        onChange={(v) => updateField('primaryAudiences', v)}
         onCreateOption={(v) => addCustomOption('audiences', v)}
-        placeholder="Select audiences..."
-        help="Specific roles and segments. Include the segment (Enterprise / Mid-Market / SMB) where it matters."
+        placeholder="Select primary audiences..."
+      />
+      <Combobox
+        mode="multi"
+        label="Secondary audiences"
+        options={audienceOptions}
+        selected={initiative.secondaryAudiences}
+        onChange={(v) => updateField('secondaryAudiences', v)}
+        onCreateOption={(v) => addCustomOption('audiences', v)}
+        placeholder="Select secondary audiences..."
       />
     </SectionWrapper>
   );
 }
 
-// Section 3: Business Need + CARET Context (from profile + scoring)
-function Section3({
+// Section 4: GTM Motions
+function Section4({
   initiative,
   updateField,
 }: {
@@ -379,69 +478,103 @@ function Section3({
     value: Initiative[K],
   ) => void;
 }) {
-  const score = calculatePriorityScore(initiative.caret);
   return (
     <SectionWrapper
-      id="3"
-      title="Business Need + CARET Context"
-      subtitle="What business need is this addressing? Reference the Level 3 metric this initiative is expected to move, and capture the CARET Priority Score for traceability."
+      id="4"
+      title="GTM Motions"
+      subtitle="Which GTM motions does this initiative touch? Browse the taxonomy by category, or use search. Used later to surface portfolio overlaps and cognitive-load risks across in-flight initiatives."
       fromProfile
     >
-      <Field label="Business need (description)">
-        <textarea
-          value={initiative.description}
-          onChange={(e) => updateField('description', e.target.value)}
-          rows={3}
-          className={inputClass}
-        />
-      </Field>
+      <MotionsPicker
+        selected={initiative.gtmMotions}
+        onChange={(v) => updateField('gtmMotions', v)}
+      />
+    </SectionWrapper>
+  );
+}
+
+// Section 5: Usage Frequency
+function Section5({
+  initiative,
+  updateField,
+}: {
+  initiative: Initiative;
+  updateField: <K extends keyof Initiative>(
+    key: K,
+    value: Initiative[K],
+  ) => void;
+}) {
+  return (
+    <SectionWrapper
+      id="5"
+      title="Usage Frequency"
+      subtitle="How often will primary and secondary audiences use this? Drives change-management estimation and cognitive-load impact."
+      fromProfile
+    >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <div className="text-sm font-medium text-gray-700">
-            Level 3 metric targeted
-          </div>
-          <div className="mt-1 text-sm text-gray-900">
-            {initiative.level3Metric || (
-              <span className="text-gray-400">Not yet set on profile</span>
-            )}
-          </div>
-        </div>
-        <div>
-          <div className="text-sm font-medium text-gray-700">
-            CARET Priority Score
-          </div>
-          <div className="mt-1 font-mono text-sm text-gray-900">
-            {score === null ? (
-              <span className="text-gray-400">Not yet scored</span>
-            ) : (
-              score.toFixed(2)
-            )}
-          </div>
-        </div>
-      </div>
-      <div>
-        <div className="mb-1 text-sm font-medium text-gray-700">
-          CARET breakdown
-        </div>
-        <div className="grid grid-cols-5 gap-2 text-center">
-          {FACTOR_ORDER.map((f) => (
-            <div key={f} className="rounded-md bg-gray-50 px-2 py-2">
-              <div className="text-xs text-gray-500">{FACTORS[f].letter}</div>
-              <div className="font-mono text-sm font-semibold text-gray-900">
-                {initiative.caret[f] > 0
-                  ? formatNumber(initiative.caret[f])
-                  : '—'}
-              </div>
-            </div>
-          ))}
-        </div>
+        <Field
+          label="Primary audience usage"
+          hint={
+            initiative.primaryAudiences.length > 0
+              ? `${initiative.primaryAudiences.join(', ')}`
+              : 'No primary audiences selected in Section 3.'
+          }
+        >
+          <select
+            value={initiative.usageFrequencyPrimary ?? ''}
+            onChange={(e) =>
+              updateField(
+                'usageFrequencyPrimary',
+                (e.target.value || null) as UsageFrequency | null,
+              )
+            }
+            className={inputClass}
+          >
+            <option value="">— not set —</option>
+            {(
+              ['daily', 'weekly', 'monthly', 'quarterly'] as UsageFrequency[]
+            ).map((f) => (
+              <option key={f} value={f}>
+                {FREQUENCY_LABELS[f]}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field
+          label="Secondary audience usage"
+          hint={
+            initiative.secondaryAudiences.length > 0
+              ? `${initiative.secondaryAudiences.join(', ')}`
+              : 'No secondary audiences selected in Section 3.'
+          }
+        >
+          <select
+            value={initiative.usageFrequencySecondary ?? ''}
+            onChange={(e) =>
+              updateField(
+                'usageFrequencySecondary',
+                (e.target.value || null) as UsageFrequency | null,
+              )
+            }
+            className={inputClass}
+          >
+            <option value="">— not set —</option>
+            {(
+              ['daily', 'weekly', 'monthly', 'quarterly'] as UsageFrequency[]
+            ).map((f) => (
+              <option key={f} value={f}>
+                {FREQUENCY_LABELS[f]}
+              </option>
+            ))}
+          </select>
+        </Field>
       </div>
     </SectionWrapper>
   );
 }
 
-// Section 4: Success Metrics (PRD-specific) — also serves Section 11
-function Section4({
+// Section 6: Success Metrics (PRD-specific) — also serves Measurement Cadence
+function Section6({
   initiative,
   updatePrd,
   customLevel1Metrics,
@@ -467,15 +600,40 @@ function Section4({
     });
   const removeMetric = (id: string) =>
     updatePrd({ metrics: metrics.filter((m) => m.id !== id) });
-  const addMetric = (level: MetricLevel) =>
-    updatePrd({ metrics: [...metrics, createMetric({ level })] });
+  const addMetric = (level: MetricLevel, name?: string) =>
+    updatePrd({
+      metrics: [...metrics, createMetric({ level, name: name ?? '' })],
+    });
+
+  // L3 auto-pull prompt: intake-time L3 metric exists but not yet in PRD metrics.
+  const intakeL3 = initiative.level3Metric.trim();
+  const l3InMetrics = metrics.some(
+    (m) => m.level === 3 && m.name.toLowerCase() === intakeL3.toLowerCase(),
+  );
+  const showL3Prompt = !!intakeL3 && !l3InMetrics;
 
   return (
     <SectionWrapper
-      id="4"
-      title="Success Metrics — All Three Layers"
-      subtitle="The specific metrics tracked during the pilot and GA. Capture the baseline, target, cadence, and tracking mechanism for each metric. The cadence column also serves Section 11 (Measurement Cadence)."
+      id="6"
+      title="Success Metrics"
+      subtitle="The specific metrics tracked during the pilot and GA — captured at all three levels. Each metric carries its own cadence and tracking mechanism."
     >
+      {showL3Prompt && (
+        <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3">
+          <div className="text-sm text-blue-900">
+            You named{' '}
+            <strong className="font-semibold">"{intakeL3}"</strong> as the
+            Level 3 metric at intake.
+          </div>
+          <button
+            type="button"
+            onClick={() => addMetric(3, intakeL3)}
+            className="mt-2 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
+          >
+            Add it to PRD metrics →
+          </button>
+        </div>
+      )}
       {([1, 2, 3] as MetricLevel[]).map((level) => {
         const levelMetrics = metrics.filter((m) => m.level === level);
         const options =
@@ -505,22 +663,22 @@ function Section4({
 
         return (
           <div key={level} className="space-y-3">
-            <div className="flex items-baseline justify-between border-b border-gray-100 pb-1">
-              <div>
+            <div className="border-b border-gray-100 pb-2">
+              <div className="flex items-baseline justify-between">
                 <div className="text-sm font-semibold text-gray-900">
                   {levelLabel}
                 </div>
-                <div className="text-xs text-gray-500">
-                  Cadence {cadenceHint}.
-                </div>
+                <button
+                  type="button"
+                  onClick={() => addMetric(level)}
+                  className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
+                >
+                  + Add metric
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => addMetric(level)}
-                className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
-              >
-                + Add metric
-              </button>
+              <p className="mt-1 text-xs text-gray-600">
+                {LEVEL_DESCRIPTIONS[level]} Cadence {cadenceHint}.
+              </p>
             </div>
             {levelMetrics.length === 0 ? (
               <div className="rounded-md border border-dashed border-gray-300 px-3 py-3 text-sm text-gray-500">
@@ -623,10 +781,11 @@ function Section4({
   );
 }
 
-// Section 5: Path: Build or Buy (from profile)
-function Section5({
+// Section 7: Path: Build or Buy (from profile)
+function Section7({
   initiative,
   updateField,
+  updatePrd,
   customTechnologies,
   addCustomOption,
 }: {
@@ -635,6 +794,7 @@ function Section5({
     key: K,
     value: Initiative[K],
   ) => void;
+  updatePrd: (patch: Partial<PRD>) => void;
   customTechnologies: string[];
   addCustomOption: (kind: 'technologies', value: string) => void;
 }) {
@@ -650,7 +810,7 @@ function Section5({
 
   return (
     <SectionWrapper
-      id="5"
+      id="7"
       title="Path: Build or Buy"
       subtitle="Confirm the path. For Buy: name the primary vendor. Document the rationale below."
       fromProfile
@@ -693,7 +853,7 @@ function Section5({
           onChange={(v) => updateField('primaryVendor', v)}
           onCreateOption={(v) => addCustomOption('technologies', v)}
           placeholder="Select or add a vendor..."
-          help="The single primary vendor this initiative depends on. Capture the broader evaluation list and rationale in the rationale field below."
+          help="The single primary vendor this initiative depends on. Capture the broader evaluation list and rationale below."
         />
       )}
       <Field
@@ -702,11 +862,7 @@ function Section5({
       >
         <textarea
           value={initiative.prd.pathRationale}
-          onChange={(e) =>
-            useRoadmapStore.getState().updateInitiative(initiative.id, {
-              prd: { ...initiative.prd, pathRationale: e.target.value },
-            })
-          }
+          onChange={(e) => updatePrd({ pathRationale: e.target.value })}
           rows={3}
           className={inputClass}
         />
@@ -715,8 +871,8 @@ function Section5({
   );
 }
 
-// Section 6: Systems and Integrations (from profile)
-function Section6({
+// Section 8: Systems and Integrations (from profile)
+function Section8({
   initiative,
   updateField,
   customSystems,
@@ -733,7 +889,7 @@ function Section6({
   const systemOptions = dedupe([...DEFAULT_SYSTEMS, ...customSystems]);
   return (
     <SectionWrapper
-      id="6"
+      id="8"
       title="Systems and Integrations"
       subtitle="Every system this initiative will touch in ongoing operations."
       fromProfile
@@ -752,8 +908,8 @@ function Section6({
   );
 }
 
-// Section 7: Data Architecture
-function Section7({
+// Section 9: Data Architecture
+function Section9({
   initiative,
   updatePrd,
 }: {
@@ -762,7 +918,7 @@ function Section7({
 }) {
   return (
     <SectionWrapper
-      id="7"
+      id="9"
       title="Data Architecture"
       subtitle="For each data type the solution handles — inputs, outputs, intermediate states — document storage location, owner, and what happens to that data if the solution is wound down. For Buy: vendor data retention policies and what data leaves your environment."
     >
@@ -779,7 +935,7 @@ function Section7({
   );
 }
 
-// Section 8: Risk Assessment
+// Section 10: Risk Assessment
 const RISK_DEFINITIONS: {
   key: keyof PRD['risks'];
   label: string;
@@ -819,7 +975,17 @@ const RISK_DEFINITIONS: {
   },
 ];
 
-function Section8({
+const DISPOSITION_LABELS: Record<
+  Exclude<RiskDispositionType, null>,
+  string
+> = {
+  accept: 'Accept',
+  mitigate: 'Mitigate',
+  escalate: 'Escalate',
+  not_applicable: 'Not applicable',
+};
+
+function Section10({
   initiative,
   updatePrd,
 }: {
@@ -841,9 +1007,9 @@ function Section8({
 
   return (
     <SectionWrapper
-      id="8"
+      id="10"
       title="Risk Assessment"
-      subtitle="Assess each risk category and pick a disposition: accept (live with it), mitigate (plan to address), or escalate (revisit the priority score)."
+      subtitle="Assess each risk category and pick a disposition: accept (live with it), mitigate (plan to address), escalate (revisit the priority score), or not applicable (no risk in this category)."
     >
       {RISK_DEFINITIONS.filter((r) => !r.buyOnly || isBuy).map((r) => {
         const risk = initiative.prd.risks[r.key];
@@ -862,26 +1028,31 @@ function Section8({
             </div>
             <p className="mt-1 text-xs text-gray-600">{r.description}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {(['accept', 'mitigate', 'escalate'] as RiskDispositionType[])
-                .filter((d): d is Exclude<RiskDispositionType, null> => !!d)
-                .map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() =>
-                      updateRisk(r.key, {
-                        disposition: risk.disposition === d ? null : d,
-                      })
-                    }
-                    className={`rounded-md border px-3 py-1 text-xs font-medium capitalize transition ${
-                      risk.disposition === d
-                        ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {d}
-                  </button>
-                ))}
+              {(
+                [
+                  'accept',
+                  'mitigate',
+                  'escalate',
+                  'not_applicable',
+                ] as Exclude<RiskDispositionType, null>[]
+              ).map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() =>
+                    updateRisk(r.key, {
+                      disposition: risk.disposition === d ? null : d,
+                    })
+                  }
+                  className={`rounded-md border px-3 py-1 text-xs font-medium transition ${
+                    risk.disposition === d
+                      ? 'border-gray-900 bg-gray-900 text-white'
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {DISPOSITION_LABELS[d]}
+                </button>
+              ))}
             </div>
             <div className="mt-3">
               <textarea
@@ -901,8 +1072,8 @@ function Section8({
   );
 }
 
-// Section 9: Pilot Plan
-function Section9({
+// Section 11: Pilot Plan
+function Section11({
   initiative,
   updatePrd,
 }: {
@@ -915,7 +1086,7 @@ function Section9({
 
   return (
     <SectionWrapper
-      id="9"
+      id="11"
       title="Pilot Plan"
       subtitle="Define cohort, timeline, intervention design, and the criteria for each Stage 5 gate decision."
     >
@@ -975,7 +1146,7 @@ function Section9({
           isn't ambiguous.
         </p>
         <div className="mt-3 space-y-3">
-          <Field label="Scale">
+          <Field label="Proceed to GA">
             <textarea
               value={pp.scaleDecision}
               onChange={(e) => update({ scaleDecision: e.target.value })}
@@ -1008,8 +1179,8 @@ function Section9({
   );
 }
 
-// Section 10: Workstreams
-function Section10({
+// Section 12: Workstreams
+function Section12({
   initiative,
   updatePrd,
 }: {
@@ -1036,7 +1207,7 @@ function Section10({
 
   return (
     <SectionWrapper
-      id="10"
+      id="12"
       title="Workstream Assignments"
       subtitle="Named owners and target dates. Every workstream needs one accountable person — not a team, a person."
     >
@@ -1058,7 +1229,7 @@ function Section10({
             </div>
           ) : (
             <p className="text-sm text-gray-500">
-              Set the path (Build or Buy) in Section 5 to enable workstream
+              Set the path (Build or Buy) in Section 7 to enable workstream
               pre-population.
             </p>
           )}
@@ -1138,77 +1309,8 @@ function Section10({
   );
 }
 
-// Section 11: Measurement Cadence (display-only, references Section 4 metrics)
-function Section11({ initiative }: { initiative: Initiative }) {
-  const metrics = initiative.prd.metrics;
-  const grouped = useMemo(() => {
-    return ([1, 2, 3] as MetricLevel[]).map((level) => ({
-      level,
-      metrics: metrics.filter((m) => m.level === level),
-    }));
-  }, [metrics]);
-  return (
-    <SectionWrapper
-      id="11"
-      title="Measurement Cadence"
-      subtitle="Per-metric tracking cadence. This summarizes the cadence column from Section 4 — change cadence values there."
-    >
-      {metrics.length === 0 ? (
-        <div className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-500">
-          No metrics defined yet. Go to Section 4 to add Level 1, Level 2, and
-          Level 3 metrics — their cadence will appear here automatically.
-        </div>
-      ) : (
-        grouped.map(({ level, metrics: lm }) => (
-          <div key={level} className="space-y-2">
-            <div className="text-sm font-semibold text-gray-900">
-              {level === 1
-                ? 'Level 1 — Behavior'
-                : level === 2
-                  ? 'Level 2 — Indicators'
-                  : 'Level 3 — Impact'}
-            </div>
-            {lm.length === 0 ? (
-              <div className="text-sm text-gray-500">No metrics at this level.</div>
-            ) : (
-              <ul className="space-y-1 text-sm">
-                {lm.map((m) => (
-                  <li
-                    key={m.id}
-                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-md bg-gray-50 px-3 py-2"
-                  >
-                    <span className="font-medium text-gray-900">
-                      {m.name || (
-                        <span className="italic text-gray-500">Unnamed metric</span>
-                      )}
-                    </span>
-                    <span className="text-xs text-gray-700">
-                      Cadence:{' '}
-                      <span className="font-medium">
-                        {CADENCE_LABELS[m.cadence]}
-                      </span>
-                      {m.trackingMechanism && (
-                        <>
-                          {' · via '}
-                          <span className="font-medium">
-                            {m.trackingMechanism}
-                          </span>
-                        </>
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))
-      )}
-    </SectionWrapper>
-  );
-}
-
-// Section 12: Approval Mechanism
-function Section12({
+// Section 13: Approval Mechanism
+function Section13({
   initiative,
   updatePrd,
 }: {
@@ -1218,7 +1320,7 @@ function Section12({
   const prd = initiative.prd;
   return (
     <SectionWrapper
-      id="12"
+      id="13"
       title="Approval Mechanism"
       subtitle="How will this PRD be approved? Specify the process and who is required to approve before circulating the PRD."
     >
@@ -1266,7 +1368,7 @@ function Section12({
   );
 }
 
-// Section 13: Conditional Accountability Compact
+// Section 14: Conditional Accountability Compact
 const COMPACT_STATUS_LABELS: Record<CompactConditionalStatus, string> = {
   pending: 'Not yet asked',
   yes: 'Yes — agreed',
@@ -1274,7 +1376,7 @@ const COMPACT_STATUS_LABELS: Record<CompactConditionalStatus, string> = {
   no: 'No — escalate',
 };
 
-function Section13({
+function Section14({
   initiative,
   updatePrd,
 }: {
@@ -1296,7 +1398,7 @@ function Section13({
 
   return (
     <SectionWrapper
-      id="13"
+      id="14"
       title="Conditional Accountability Compact"
       subtitle="A written agreement specifying what will be expected of the executive sponsor if the pilot succeeds. Walk through the four commitments below in conversation, capture the exec's response, and document what they agreed to. The Compact is conditionally signed here; binding execution happens at the Stage 5→6 gate."
     >

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import type { Initiative } from '../types';
-import { prdSectionsComplete } from '../lib/prdProgress';
+import { prdSectionsComplete, PRD_TOTAL_SECTIONS } from '../lib/prdProgress';
 
 export default function PRDLauncher({
   initiative,
@@ -9,7 +9,7 @@ export default function PRDLauncher({
 }) {
   const navigate = useNavigate();
   const complete = prdSectionsComplete(initiative);
-  const total = 13;
+  const total = PRD_TOTAL_SECTIONS;
   const pct = Math.round((complete / total) * 100);
 
   return (

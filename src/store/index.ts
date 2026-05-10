@@ -23,7 +23,12 @@ interface RoadmapState {
 
 type LegacyInitiativeV1 = Omit<
   Initiative,
-  | 'audiencesServed'
+  | 'primaryAudiences'
+  | 'secondaryAudiences'
+  | 'usageFrequencyPrimary'
+  | 'usageFrequencySecondary'
+  | 'gtmMotions'
+  | 'businessRationale'
   | 'technologies'
   | 'systemsTouched'
   | 'caretNotes'
@@ -34,7 +39,14 @@ type LegacyInitiativeV1 = Omit<
   | 'primaryVendor'
   | 'prd'
 > & {
+  // Pre-v8 field name
   audiencesServed?: string | string[];
+  primaryAudiences?: string[];
+  secondaryAudiences?: string[];
+  usageFrequencyPrimary?: Initiative['usageFrequencyPrimary'];
+  usageFrequencySecondary?: Initiative['usageFrequencySecondary'];
+  gtmMotions?: string[];
+  businessRationale?: string;
   technologies?: string | string[];
   systemsTouched?: string | string[];
   caretNotes?: Initiative['caretNotes'];
@@ -74,9 +86,17 @@ const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => {
             },
           ]
         : [];
+  // Audience field rename: audiencesServed -> primaryAudiences
+  const primaryAudiences =
+    raw.primaryAudiences ?? splitLegacyString(raw.audiencesServed);
   return {
     ...(raw as unknown as Initiative),
-    audiencesServed: splitLegacyString(raw.audiencesServed),
+    businessRationale: raw.businessRationale ?? '',
+    primaryAudiences,
+    secondaryAudiences: raw.secondaryAudiences ?? [],
+    usageFrequencyPrimary: raw.usageFrequencyPrimary ?? null,
+    usageFrequencySecondary: raw.usageFrequencySecondary ?? null,
+    gtmMotions: raw.gtmMotions ?? [],
     technologies: splitLegacyString(raw.technologies),
     systemsTouched: splitLegacyString(raw.systemsTouched),
     caret,
@@ -90,7 +110,7 @@ const migrateLegacyInitiative = (raw: LegacyInitiativeV1): Initiative => {
   };
 };
 
-const STORE_VERSION = 7;
+const STORE_VERSION = 8;
 
 export const useRoadmapStore = create<RoadmapState>()(
   persist(

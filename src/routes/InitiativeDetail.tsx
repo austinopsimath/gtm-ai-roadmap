@@ -15,6 +15,7 @@ import {
   type Initiative,
   type Stage,
 } from '../types';
+import { findMotion } from '../constants/motions';
 import { formatRelativeTime } from '../lib/time';
 import HealthBadge from '../components/HealthBadge';
 import StageBadge from '../components/StageBadge';
@@ -90,6 +91,14 @@ export default function InitiativeDetail() {
               {initiative.description}
             </p>
           )}
+          {initiative.businessRationale && (
+            <div className="mt-3 max-w-2xl rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-700">
+              <span className="font-medium text-gray-900">
+                Why this matters:
+              </span>{' '}
+              {initiative.businessRationale}
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           <button
@@ -154,9 +163,25 @@ function ProfileSection({ initiative }: { initiative: Initiative }) {
 
         <Card title="Scope">
           <ChipsDetail
-            label="Audiences served"
-            values={initiative.audiencesServed}
+            label="Primary audiences"
+            values={initiative.primaryAudiences}
           />
+          {initiative.usageFrequencyPrimary && (
+            <Detail
+              label="Primary audience usage"
+              value={capitalize(initiative.usageFrequencyPrimary)}
+            />
+          )}
+          <ChipsDetail
+            label="Secondary audiences"
+            values={initiative.secondaryAudiences}
+          />
+          {initiative.usageFrequencySecondary && (
+            <Detail
+              label="Secondary audience usage"
+              value={capitalize(initiative.usageFrequencySecondary)}
+            />
+          )}
           <ChipsDetail
             label="Technologies / Vendors for Build"
             values={initiative.technologies}
@@ -166,6 +191,10 @@ function ProfileSection({ initiative }: { initiative: Initiative }) {
             values={initiative.systemsTouched}
           />
           <Detail label="Level 3 metric" value={initiative.level3Metric} />
+        </Card>
+
+        <Card title="GTM Motions">
+          <GtmMotionsList ids={initiative.gtmMotions} />
         </Card>
 
         <Card title="Key dates">
@@ -248,6 +277,46 @@ function ChipsDetail({ label, values }: { label: string; values: string[] }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function GtmMotionsList({ ids }: { ids: string[] }) {
+  if (ids.length === 0) {
+    return <div className="text-sm text-gray-400">No motions selected.</div>;
+  }
+  // Group by category for display.
+  const groups = new Map<string, string[]>();
+  for (const id of ids) {
+    const found = findMotion(id);
+    if (!found) continue;
+    const key = found.category.label;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(found.motion.label);
+  }
+  return (
+    <div className="space-y-2">
+      {Array.from(groups.entries()).map(([cat, motions]) => (
+        <div key={cat}>
+          <div className="text-xs font-medium uppercase tracking-wider text-gray-500">
+            {cat}
+          </div>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {motions.map((m) => (
+              <span
+                key={m}
+                className="inline-flex rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-800"
+              >
+                {m}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   type Initiative,
   type Path,
   type Stage,
+  type UsageFrequency,
 } from '../types';
 import { useRoadmapStore } from '../store';
 import {
@@ -17,6 +18,7 @@ import {
   DEFAULT_TECHNOLOGIES,
 } from '../constants/picklists';
 import Combobox from './Combobox';
+import MotionsPicker from './MotionsPicker';
 
 interface Props {
   initial?: Partial<Initiative>;
@@ -28,13 +30,18 @@ interface Props {
 export interface InitiativeFormValues {
   name: string;
   description: string;
+  businessRationale: string;
   stage: Stage;
   health: Health;
   initiativeOwner: string;
   executiveSponsor: string;
   path: Path | null;
   primaryVendor: string;
-  audiencesServed: string[];
+  primaryAudiences: string[];
+  secondaryAudiences: string[];
+  usageFrequencyPrimary: UsageFrequency | null;
+  usageFrequencySecondary: UsageFrequency | null;
+  gtmMotions: string[];
   technologies: string[];
   systemsTouched: string[];
   level3Metric: string;
@@ -62,13 +69,18 @@ export default function InitiativeForm({
   const [values, setValues] = useState<InitiativeFormValues>({
     name: initial?.name ?? '',
     description: initial?.description ?? '',
+    businessRationale: initial?.businessRationale ?? '',
     stage: initial?.stage ?? 'prioritize',
     health: initial?.health ?? 'green',
     initiativeOwner: initial?.initiativeOwner ?? '',
     executiveSponsor: initial?.executiveSponsor ?? '',
     path: initial?.path ?? null,
     primaryVendor: initial?.primaryVendor ?? '',
-    audiencesServed: initial?.audiencesServed ?? [],
+    primaryAudiences: initial?.primaryAudiences ?? [],
+    secondaryAudiences: initial?.secondaryAudiences ?? [],
+    usageFrequencyPrimary: initial?.usageFrequencyPrimary ?? null,
+    usageFrequencySecondary: initial?.usageFrequencySecondary ?? null,
+    gtmMotions: initial?.gtmMotions ?? [],
     technologies: initial?.technologies ?? [],
     systemsTouched: initial?.systemsTouched ?? [],
     level3Metric: initial?.level3Metric ?? '',
@@ -120,6 +132,15 @@ export default function InitiativeForm({
             onChange={(e) => setField('description', e.target.value)}
             rows={2}
             placeholder="One-sentence plain-language summary"
+            className={inputClass}
+          />
+        </Field>
+        <Field label="Business rationale">
+          <textarea
+            value={values.businessRationale}
+            onChange={(e) => setField('businessRationale', e.target.value)}
+            rows={2}
+            placeholder="Why is this important? What changes if we don't do it?"
             className={inputClass}
           />
         </Field>
@@ -177,19 +198,78 @@ export default function InitiativeForm({
       </Section>
 
       <Section
-        title="Scope"
-        subtitle="Build vs. Buy and primary vendor are decided in the Calendar stage, not at intake — they live in the lifecycle view alongside timeline planning."
+        title="Audiences & Usage"
+        subtitle="Build vs. Buy and primary vendor are decided in the PRD stage, not at intake."
       >
         <Combobox
           mode="multi"
-          label="Audiences served"
+          label="Primary audiences"
           options={audienceOptions}
-          selected={values.audiencesServed}
-          onChange={(v) => setField('audiencesServed', v)}
+          selected={values.primaryAudiences}
+          onChange={(v) => setField('primaryAudiences', v)}
           onCreateOption={(v) => addCustomOption('audiences', v)}
-          help="Specific roles and segments. Pick all that apply, or add your own."
-          placeholder="Select audiences..."
+          help="The roles and segments this initiative is built for first."
+          placeholder="Select primary audiences..."
         />
+        <Field label="Primary audience usage frequency">
+          <select
+            value={values.usageFrequencyPrimary ?? ''}
+            onChange={(e) =>
+              setField(
+                'usageFrequencyPrimary',
+                (e.target.value || null) as UsageFrequency | null,
+              )
+            }
+            className={inputClass}
+          >
+            <option value="">— not set —</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+          </select>
+        </Field>
+        <Combobox
+          mode="multi"
+          label="Secondary audiences"
+          options={audienceOptions}
+          selected={values.secondaryAudiences}
+          onChange={(v) => setField('secondaryAudiences', v)}
+          onCreateOption={(v) => addCustomOption('audiences', v)}
+          help="Roles and segments that benefit indirectly or in a later wave."
+          placeholder="Select secondary audiences..."
+        />
+        <Field label="Secondary audience usage frequency">
+          <select
+            value={values.usageFrequencySecondary ?? ''}
+            onChange={(e) =>
+              setField(
+                'usageFrequencySecondary',
+                (e.target.value || null) as UsageFrequency | null,
+              )
+            }
+            className={inputClass}
+          >
+            <option value="">— not set —</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+          </select>
+        </Field>
+      </Section>
+
+      <Section
+        title="GTM Motions"
+        subtitle="Which GTM motions does this initiative touch? Used later to surface portfolio overlaps and cognitive-load risks. Categories collapsed by default — expand any to browse, or use search."
+      >
+        <MotionsPicker
+          selected={values.gtmMotions}
+          onChange={(v) => setField('gtmMotions', v)}
+        />
+      </Section>
+
+      <Section title="Tools & Metrics">
         <Combobox
           mode="multi"
           label="Technologies / Vendors for Build"
