@@ -1,3 +1,4 @@
+import { createContext, useContext, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useRoadmapStore } from '../store';
 import {
@@ -69,6 +70,20 @@ const SECTIONS = [
   { id: '14', title: 'Conditional Compact' },
 ];
 
+interface PRDUIContextValue {
+  isOpen: (id: string) => boolean;
+  toggleSection: (id: string) => void;
+  initiative: Initiative;
+}
+
+const PRDUIContext = createContext<PRDUIContextValue | null>(null);
+
+function usePRDUI(): PRDUIContextValue {
+  const ctx = useContext(PRDUIContext);
+  if (!ctx) throw new Error('usePRDUI must be used inside PRDUIContext');
+  return ctx;
+}
+
 export default function PRDEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -84,6 +99,8 @@ export default function PRDEdit() {
   const customLevel3Metrics = useRoadmapStore((s) => s.customLevel3Metrics);
   const addCustomOption = useRoadmapStore((s) => s.addCustomOption);
 
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+
   if (!initiative) return <Navigate to="/" replace />;
 
   const updateField = <K extends keyof Initiative>(
@@ -96,7 +113,41 @@ export default function PRDEdit() {
       prd: { ...initiative.prd, ...patch },
     });
 
+  const toggleSection = (id: string) => {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const expandAll = () =>
+    setOpenSections(new Set(SECTIONS.map((s) => s.id)));
+  const collapseAll = () => setOpenSections(new Set());
+
+  const handleNavSelect = (id: string) => {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+    setTimeout(() => {
+      document
+        .getElementById(`section-${id}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  const isOpen = (id: string) => openSections.has(id);
+  const allOpen =
+    openSections.size === SECTIONS.length;
+  const noneOpen = openSections.size === 0;
+
   return (
+    <PRDUIContext.Provider
+      value={{ isOpen, toggleSection, initiative }}
+    >
     <div>
       <div className="mb-2">
         <Link
@@ -130,11 +181,30 @@ export default function PRDEdit() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
         <aside className="hidden lg:block">
           <div className="sticky top-6">
-            <SectionNav initiative={initiative} />
+            <SectionNav
+              initiative={initiative}
+              onSelect={handleNavSelect}
+            />
           </div>
         </aside>
 
-        <main className="space-y-10">
+        <main className="space-y-3">
+          <div className="flex items-center justify-end gap-2 pb-2">
+            <button
+              onClick={expandAll}
+              disabled={allOpen}
+              className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Expand all
+            </button>
+            <button
+              onClick={collapseAll}
+              disabled={noneOpen}
+              className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Collapse all
+            </button>
+          </div>
           <Section1
             initiative={initiative}
             updateField={updateField}
@@ -184,10 +254,17 @@ export default function PRDEdit() {
         </main>
       </div>
     </div>
+    </PRDUIContext.Provider>
   );
 }
 
-function SectionNav({ initiative }: { initiative: Initiative }) {
+function SectionNav({
+  initiative,
+  onSelect,
+}: {
+  initiative: Initiative;
+  onSelect: (id: string) => void;
+}) {
   return (
     <nav>
       <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -198,9 +275,10 @@ function SectionNav({ initiative }: { initiative: Initiative }) {
           const complete = isPRDSectionComplete(initiative, s.id);
           return (
             <li key={s.id}>
-              <a
-                href={`#section-${s.id}`}
-                className="flex items-center gap-2 rounded px-2 py-1 hover:bg-gray-100"
+              <button
+                type="button"
+                onClick={() => onSelect(s.id)}
+                className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-gray-100"
               >
                 <span
                   className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded ${
@@ -226,7 +304,7 @@ function SectionNav({ initiative }: { initiative: Initiative }) {
                 </span>
                 <span className="text-gray-500">{s.id}.</span>
                 <span className="text-gray-900">{s.title}</span>
-              </a>
+              </button>
             </li>
           );
         })}
@@ -250,24 +328,74 @@ function SectionWrapper({
   children: React.ReactNode;
   fromProfile?: boolean;
 }) {
+  const { isOpen, toggleSection, initiative } = usePRDUI();
+  const open = isOpen(id);
+  const complete = isPRDSectionComplete(initiative, id);
+
   return (
-    <section id={`section-${id}`} className="scroll-mt-6">
-      <header className="mb-4 border-b border-gray-200 pb-3">
-        <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Section {id}
+    <section
+      id={`section-${id}`}
+      className="scroll-mt-6 rounded-lg border border-gray-200 bg-white"
+    >
+      <button
+        type="button"
+        onClick={() => toggleSection(id)}
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left hover:bg-gray-50"
+      >
+        <div className="flex flex-1 items-center gap-3">
+          <span
+            className="flex h-5 w-5 shrink-0 items-center justify-center text-gray-400"
+            aria-hidden
+          >
+            {open ? '▾' : '▸'}
+          </span>
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Section {id}
+            </div>
+            <h2 className="mt-0.5 text-base font-semibold text-gray-900">
+              {title}
+            </h2>
+          </div>
         </div>
-        <h2 className="mt-0.5 text-lg font-semibold text-gray-900">{title}</h2>
-        {subtitle && (
-          <p className="mt-1 text-sm text-gray-600">{subtitle}</p>
-        )}
-        {fromProfile && (
-          <p className="mt-2 text-xs text-gray-500">
-            <span className="font-medium">Note:</span> changes here update the
-            initiative profile (visible elsewhere in the app too).
-          </p>
-        )}
-      </header>
-      <div className="space-y-4">{children}</div>
+        <span
+          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded ${
+            complete
+              ? 'bg-emerald-500 text-white'
+              : 'border border-gray-300 bg-white'
+          }`}
+          title={complete ? 'Section complete' : 'Section incomplete'}
+        >
+          {complete && (
+            <svg
+              className="h-3.5 w-3.5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 011.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          )}
+        </span>
+      </button>
+      {open && (
+        <div className="space-y-4 border-t border-gray-200 px-5 py-5">
+          {subtitle && (
+            <p className="text-sm text-gray-600">{subtitle}</p>
+          )}
+          {fromProfile && (
+            <p className="text-xs text-gray-500">
+              <span className="font-medium">Note:</span> changes here update
+              the initiative profile (visible elsewhere in the app too).
+            </p>
+          )}
+          {children}
+        </div>
+      )}
     </section>
   );
 }
