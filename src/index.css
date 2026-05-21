@@ -15,3 +15,19 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Preserve background colors of badges and cards in the printed PRD. */
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

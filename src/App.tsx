@@ -7,10 +7,13 @@ import InitiativeDetail from './routes/InitiativeDetail';
 import ScoreInitiative from './routes/ScoreInitiative';
 import Roadmap from './routes/Roadmap';
 import PRDEdit from './routes/PRDEdit';
+import PRDView from './routes/PRDView';
 
 export default function App() {
   return (
     <Routes>
+      {/* Standalone printable document — rendered outside the app chrome. */}
+      <Route path="/initiatives/:id/prd/view" element={<PRDView />} />
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/roadmap" element={<Roadmap />} />
