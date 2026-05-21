@@ -6,7 +6,7 @@
 
 Most GTM AI initiatives fail not because the technology is wrong, but because the process of selecting, sequencing, building, and embedding AI is improvised. This framework provides a repeatable operating system for managing a GTM AI roadmap — from idea intake to full adoption — with explicit gates at every stage to prevent bad investments from advancing.
 
-The framework has six stages — **Prioritize → PRD → Calendar → Deploy → Pilot → GA** — each followed by explicit exit criteria that must be satisfied before the next stage begins. The exit criteria sections carry as much weight as the stage sections themselves; they are where the gatekeeping actually happens. The PRD (Stage 2) is the framework's most consequential planning artifact: it documents the business rationale, audiences, GTM motions touched, success metrics, path, systems, risks, pilot plan, workstreams, and the conditional Accountability Compact (Section 14). Between Stages 5 and 6, the Accountability Compact is formally executed.
+The framework has seven stages — **Prioritize → PRD → Calendar → Deploy → Pilot → Commitment → GA** — each followed by explicit exit criteria that must be satisfied before the next stage begins. The exit criteria sections carry as much weight as the stage sections themselves; they are where the gatekeeping actually happens. The PRD (Stage 2) is the framework's most consequential planning artifact: it documents the business rationale, audiences, GTM motions touched, success metrics, path, systems, risks, pilot plan, workstreams, and the conditional Accountability Compact (Section 14). In Stage 6 (Commitment), that conditional Compact is formally executed as a binding agreement before GA begins.
 
 ---
 
@@ -46,7 +46,7 @@ For every initiative, the Registry captures:
 | **Name** | Short, distinct name used everywhere this initiative is referenced |
 | **Description** | One-sentence plain-language summary of what it does |
 | **Business Rationale** | The "why this matters" articulation — what changes if this isn't done |
-| **Current Stage** | 1 (Prioritize), 2 (PRD), 3 (Calendar), 4 (Deploy), 5 (Pilot), 6 (GA), Killed, or Wound Down |
+| **Current Stage** | 1 (Prioritize), 2 (PRD), 3 (Calendar), 4 (Deploy), 5 (Pilot), 6 (Commitment), 7 (GA), Killed, or Wound Down |
 | **Health** | Green / Yellow / Red — the Roadmap Owner's portfolio-level judgment, not a self-report from the Initiative Owner |
 | **Initiative Owner** | Named individual accountable end-to-end |
 | **Executive Sponsor** | Named leader who signed (or conditionally signed) the Accountability Compact |
@@ -416,26 +416,21 @@ When training is required, design it around the full workflow — not the tool i
 
 ## Stage 5 Exit Criteria
 
-An initiative cannot advance to GA until the panel has made an explicit decision across three possible outcomes:
+An initiative cannot advance to Stage 6 (Commitment) until the panel has made an explicit, documented decision across three possible outcomes:
 
-**Proceed to GA:** The pilot hit (or materially exceeded) the success metric. Enablement is ready. Roll out to the full population.
+**Proceed to GA:** The pilot hit (or materially exceeded) the success metric. Advance to Stage 6 (Commitment) to execute the Accountability Compact and confirm GA readiness.
 
-**Fix and Re-Pilot:** The pilot revealed a specific, correctable problem. The issue is documented, a fix is scoped, and a second pilot is scheduled. Do not advance to GA on optimism.
+**Fix and Re-Pilot:** The pilot revealed a specific, correctable problem. The issue is documented, a fix is scoped, and a second pilot is scheduled. Do not advance on optimism.
 
 **Kill:** The initiative did not produce the expected value and the path to fixing it is unclear or disproportionately expensive. Return the initiative to the queue at a lower priority or retire it. A kill decision is not a failure — it is the framework working correctly.
 
-If the panel chooses Proceed to GA, the following must also be true before GA begins:
-
-- [ ] **Enablement team is ready to onboard the full population** — training materials, manager briefs, and reinforcement plan are finalized
-- [ ] **Measurement dashboard is built** — GA-state metrics will be tracked in a live dashboard from day one, not reconstructed after the fact
-- [ ] **Ownership continuity confirmed** — the Initiative Owner either commits to continuing ownership through GA or formally hands off to a named successor who accepts accountability for adoption, measurement, and ongoing optimization
-- [ ] **Accountability Compact is executed** — the conditional commitment captured in PRD Section 14 is converted into a signed agreement; see below
+The decision must be anchored to the success metrics defined in PRD Section 6 and the decision criteria written into PRD Section 11 — measured against the actual pilot results and the qualitative feedback collected from the cohort. The explicit, documented decision is the Stage 5 gate. Only a Proceed-to-GA decision opens Stage 6; the GA-readiness work itself happens there.
 
 ---
 
-## The Accountability Compact: Execution
+## Stage 6: Commitment
 
-*This step occurs between Stages 5 and 6 — after the Proceed-to-GA decision is made, before GA launches.*
+**Purpose:** Execute the Accountability Compact — converting the executive sponsor's conditional commitment into a binding, signed agreement — and confirm the organization is ready for GA launch. This is a deliberately distinct stage. The absence of sustained leadership accountability is the single most common reason GTM AI initiatives decay after GA; making the Compact its own gate, rather than a step buried inside Pilot, is what keeps it from being skipped.
 
 ### What Happens Here
 
@@ -443,21 +438,26 @@ The pilot hit the success metrics. The Proceed-to-GA decision has been made. Now
 
 This is not a renegotiation. The exec reviewed and conditionally agreed to the specific terms months ago. The Initiative Owner returns with the same document and a simple ask: *"The pilot succeeded. These are the terms you agreed to. Let's execute."*
 
-If the executive sponsor is now reluctant to sign — despite having conditionally agreed — that reluctance is a critical signal. Do not proceed to GA without resolving it. An exec who won't commit at this stage will not hold managers accountable during the 90-day reinforcement arc, and the initiative will decay.
+If the executive sponsor is now reluctant to sign — despite having conditionally agreed — that reluctance is a critical signal. Do not advance to GA without resolving it. An exec who won't commit at this stage will not hold managers accountable during the 90-day reinforcement arc, and the initiative will decay.
 
-### Execution Checklist
+---
 
-Before GA launch date is set, all of the following must be documented and confirmed:
+## Stage 6 Exit Criteria
+
+An initiative cannot advance to Stage 7 (GA) until all of the following are documented and confirmed. The first five execute the Accountability Compact; the last three confirm the organization is operationally ready to launch.
 
 - [ ] **Compact is signed** — the executive sponsor has formally committed to the four accountability terms agreed to in PRD Section 14
 - [ ] **Frontline managers are briefed** — each in-scope manager has been individually briefed on their specific obligations: coaching cadence, metrics they'll be reviewing, and the dashboard they'll use
 - [ ] **Coaching cadence is calendared** — dedicated coaching sessions (separate from deal reviews) are on the calendar before GA day one
 - [ ] **Exec communication is drafted and scheduled** — the expectation-setting message from leadership to reps and managers is written and has a confirmed delivery date before or at GA launch
 - [ ] **Accountability check-in dates are set** — the Initiative Owner and executive sponsor have scheduled at least two check-ins during the first 90 days of GA to review manager coaching compliance alongside behavior change metrics
+- [ ] **Enablement team is ready to onboard the full population** — training materials, manager briefs, and reinforcement plan are finalized
+- [ ] **Measurement dashboard is built** — GA-state metrics will be tracked in a live dashboard from day one, not reconstructed after the fact
+- [ ] **Ownership continuity confirmed** — the Initiative Owner either commits to continuing ownership through GA or formally hands off to a named successor who accepts accountability for adoption, measurement, and ongoing optimization
 
 ---
 
-## Stage 6: GA (General Availability)
+## Stage 7: GA (General Availability)
 
 **Purpose:** Achieve durable, organization-wide adoption and close the feedback loop back to Stage 1.
 
@@ -469,7 +469,7 @@ Most GTM AI initiatives that make it to GA fail here — not with a dramatic cra
 
 Not all reinforcement is equal. Before designing the GA reinforcement plan, the team should understand the impact hierarchy and weight their plan accordingly — from most impactful to least:
 
-**1. Accountability** *(most impactful)* — Leadership holding frontline managers accountable for holding reps accountable. This is the foundation. Without it, everything above it degrades. The Accountability Compact executed between Stages 5 and 6 is the mechanism for this.
+**1. Accountability** *(most impactful)* — Leadership holding frontline managers accountable for holding reps accountable. This is the foundation. Without it, everything above it degrades. The Accountability Compact, executed in Stage 6 (Commitment), is the mechanism for this.
 
 **2. Manager-Led Coaching** — Dedicated 1:1 or small group coaching sessions focused specifically on the target behaviors and behavior change metrics. Ideally led by frontline managers; can be led by enablement as a fallback (think performance coaches, not trainers). Critically, this must be a separate cadence from deal reviews and pipeline calls — coaching agenda items reliably lose to deal urgency when they share the same meeting.
 
@@ -485,7 +485,7 @@ The reinforcement plan should lead with accountability and coaching. Teams that 
 
 The first 90 days of GA are a managed reinforcement period, not a handoff. Structure it in three phases:
 
-**Days 1–30 (Onboard):** Full population onboarding, with manager-led kickoffs in each team. The executive sponsor delivers the expectation-setting communication committed to in the Accountability Compact — this comes from leadership, not from enablement. The measurement dashboard goes live. Frontline managers begin the dedicated coaching cadence on day one; these sessions should already be calendared from the Compact execution checklist.
+**Days 1–30 (Onboard):** Full population onboarding, with manager-led kickoffs in each team. The executive sponsor delivers the expectation-setting communication committed to in the Accountability Compact — this comes from leadership, not from enablement. The measurement dashboard goes live. Frontline managers begin the dedicated coaching cadence on day one; these sessions should already be calendared from the Stage 6 (Commitment) exit criteria.
 
 **Days 31–60 (Reinforce):** First behavior data (Level 1 metrics) is reviewed in manager coaching sessions using the decoder ring (see below). Identify and address the bottom quartile of adopters — not punitively, but diagnostically. Is the workflow integration confusing? Is management not coaching? Is in-workflow documentation missing from a key click path? Fix the root cause, not the symptom.
 
@@ -532,7 +532,8 @@ The quarterly roadmap review incorporates GA performance data: are live initiati
 | **Stage 3 Exit Criteria** | Confirm timeline is realistic against portfolio capacity | Placed on calendar; cumulative cognitive load verified; no blackout-window conflicts |
 | **4 — Deploy** | Build or buy the solution to pilot-ready state | — |
 | **Stage 4 Exit Criteria** | Confirm solution is ready for controlled pilot | Functional build; measurement cadence operational; cohort prepared; rollback criteria set; enablement brief drafted; PRD revised |
-| **5 — Pilot** | Test with controlled cohort; make Proceed-to-GA / Fix / Kill decision | — |
-| **Stage 5 Exit Criteria** | Confirm Proceed-to-GA decision and GA readiness | Proceed-to-GA decision made; enablement ready; dashboard built; ownership continuity confirmed; Accountability Compact executed |
-| **Accountability Compact: Execution** | Convert conditional leadership commitment to binding agreement | Compact signed; managers briefed; coaching cadence calendared; exec communication scheduled |
-| **6 — GA** | Drive durable adoption; close feedback loop | Reinforcement hierarchy deployed; 90-day arc managed; decay monitoring active; learnings fed to Stage 1 |
+| **5 — Pilot** | Test with controlled cohort; make the Proceed-to-GA / Fix / Kill decision | — |
+| **Stage 5 Exit Criteria** | Confirm the pilot decision | Explicit Proceed-to-GA, Fix-and-Re-Pilot, or Kill decision documented against the success metrics and PRD decision criteria |
+| **6 — Commitment** | Execute the Accountability Compact; confirm GA readiness | — |
+| **Stage 6 Exit Criteria** | Convert conditional leadership commitment into a binding agreement and confirm launch readiness | Compact signed; managers briefed; coaching cadence calendared; exec communication scheduled; check-in dates set; enablement ready; dashboard built; ownership continuity confirmed |
+| **7 — GA** | Drive durable adoption; close feedback loop | Reinforcement hierarchy deployed; 90-day arc managed; decay monitoring active; learnings fed to Stage 1 |

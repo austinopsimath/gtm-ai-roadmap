@@ -43,7 +43,7 @@ Because the app is purely static, anyone can fork this repo and host their own c
 
 Phases 0–4b shipped. The 14-section PRD Builder and a standalone printable PRD view (`window.print()` → PDF, plus Copy as Markdown) are fully usable. See [BUILD_PLAN.md](BUILD_PLAN.md) for what's built and what's planned.
 
-Currently up next: Phase 5 (Compact execution ceremony), Phase 6 (GA tracking), Phase 7 (PWA polish), Phase 8 (custom-domain launch).
+Currently up next: Phase 5 (Deploy), Phase 6 (Pilot), Phase 7 (Commitment — the Accountability Compact promoted to its own lifecycle stage), Phase 8 (GA tracking), then Polish and Launch.
 
 ## License
 

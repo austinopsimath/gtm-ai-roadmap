@@ -148,9 +148,11 @@ the backup file format is `{ version, exportedAt, initiatives }`.
   Part dividers + a grouped TOC sidebar — mirrored into the PRD edit page.
 
 Structural decisions made along the way:
-- **Six lifecycle stages:** Prioritize → PRD → Calendar → Deploy → Pilot → GA.
-  PRD is its own stage (Stage 2), *before* Calendar — you plan before you
-  schedule.
+- **Lifecycle stages:** the shipped code has six — Prioritize → PRD → Calendar
+  → Deploy → Pilot → GA. PRD is its own stage (Stage 2), *before* Calendar —
+  you plan before you schedule. A seventh stage, **Commitment** (the
+  Accountability Compact execution), is planned between Pilot and GA in
+  Phase 7 — see Section 9. The framework markdown already reflects all seven.
 - **Naming quirk:** the Calendar stage's internal key is still `'roadmap'`
   (label-only rename, to avoid a data migration). `stage: 'roadmap'` in data
   means "Calendar" in the UI. The portfolio `/roadmap` route is a separate
@@ -196,22 +198,33 @@ Structural decisions made along the way:
 
 ## 9. What's left — recommended order
 
-From [BUILD_PLAN.md](BUILD_PLAN.md). Recommended sequence:
+From [BUILD_PLAN.md](BUILD_PLAN.md). The plan was **re-sequenced 2026-05-21**
+to walk the lifecycle in order — it previously jumped from PRD straight to the
+Compact execution, skipping real Deploy and Pilot work. Recommended sequence:
 
-1. **Phase 5 — Accountability Compact execution** *(do next)*. The Stage 5→6
-   ceremony that converts the conditional Compact (PRD Section 14) into a
-   binding signed agreement, with the execution checklist. The conditional
-   half is already built in Phase 4a, so this layers cleanly on top.
-2. **Phase 6 — GA Tracking.** The 90-day reinforcement arc (Onboard /
-   Reinforce / Embed), Manager Decoder Ring, decay-signal monitoring.
-3. **Phase 7 — Polish + PWA.** Landing page at `/`, installable PWA
-   (manifest + service worker), first-visit onboarding, empty states,
-   responsive pass, code-split the GTM Motions taxonomy.
-4. **Phase 8 — Launch.** CNAME `roadmap.salesexcellence.xyz` → Cloudflare,
-   final QA, distribution (LinkedIn, newsletter).
+1. **Phase 5 — Deploy (Stage 4)** *(do next)*. Workstream tracker on the PRD
+   §12 workstreams (per-workstream status), a measurement-readiness check over
+   the §6 metrics, and a lightweight "Mark PRD as revised" flag.
+2. **Phase 6 — Pilot (Stage 5).** Per-metric result entry (baseline → target →
+   result), qualitative feedback (What worked / didn't / missing), and the
+   Proceed / Fix-and-Re-Pilot / Kill decision recorder.
+3. **Phase 7 — Commitment (Stage 6 — NEW stage).** A new seventh lifecycle
+   stage between Pilot and GA: the Accountability Compact execution ceremony.
+   Promoted from a checklist item to its own stage to reinforce its
+   importance (same move as making PRD its own stage). Requires a
+   `STORE_VERSION` bump and a new `'commitment'` Stage value.
+4. **Phase 8 — GA Tracking (Stage 7).** The 90-day reinforcement arc
+   (Onboard / Reinforce / Embed), Manager Decoder Ring, decay-signal
+   monitoring.
+5. **Phase 9 — Polish + PWA.** Landing page at `/`, installable PWA,
+   first-visit onboarding, empty states, responsive pass, code-split the GTM
+   Motions taxonomy.
+6. **Phase 10 — Launch.** CNAME `roadmap.salesexcellence.xyz` → Cloudflare,
+   final QA, distribution.
 
-The order follows the lifecycle flow and ships tangible value early. 5 is
-small-to-medium; 6 and 7 are larger.
+The lifecycle is now seven stages: Prioritize → PRD → Calendar → Deploy →
+Pilot → Commitment → GA. The framework markdown reflects all seven; the app
+code stays at six until Phase 7 ships the `'commitment'` stage.
 
 ---
 
