@@ -262,10 +262,10 @@ function GroupHeader({
         first ? 'mt-8' : 'mt-14'
       }`}
     >
-      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
         Part {part}
       </div>
-      <div className="mt-0.5 text-xl font-semibold tracking-tight text-gray-900">
+      <div className="mt-0.5 text-2xl font-semibold tracking-tight text-gray-900">
         {title}
       </div>
     </div>

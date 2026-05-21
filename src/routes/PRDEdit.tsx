@@ -70,6 +70,16 @@ const SECTIONS = [
   { id: '14', title: 'Conditional Compact' },
 ];
 
+const SECTION_PARTS: {
+  part: number;
+  title: string;
+  sectionIds: string[];
+}[] = [
+  { part: 1, title: 'What & Why', sectionIds: ['1', '2', '3', '4', '5', '6'] },
+  { part: 2, title: 'Deployment', sectionIds: ['7', '8', '9', '10'] },
+  { part: 3, title: 'Implementation', sectionIds: ['11', '12', '13', '14'] },
+];
+
 interface PRDUIContextValue {
   isOpen: (id: string) => boolean;
   toggleSection: (id: string) => void;
@@ -205,6 +215,7 @@ export default function PRDEdit() {
               Collapse all
             </button>
           </div>
+          <PartDivider part={1} title="What & Why" />
           <Section1
             initiative={initiative}
             updateField={updateField}
@@ -232,6 +243,7 @@ export default function PRDEdit() {
             customLevel3Metrics={customLevel3Metrics}
             addCustomOption={addCustomOption}
           />
+          <PartDivider part={2} title="Deployment" />
           <Section7
             initiative={initiative}
             updateField={updateField}
@@ -247,6 +259,7 @@ export default function PRDEdit() {
           />
           <Section9 initiative={initiative} updatePrd={updatePrd} />
           <Section10 initiative={initiative} updatePrd={updatePrd} />
+          <PartDivider part={3} title="Implementation" />
           <Section11 initiative={initiative} updatePrd={updatePrd} />
           <Section12 initiative={initiative} updatePrd={updatePrd} />
           <Section13 initiative={initiative} updatePrd={updatePrd} />
@@ -266,50 +279,69 @@ function SectionNav({
   onSelect: (id: string) => void;
 }) {
   return (
-    <nav>
-      <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-        PRD sections
-      </div>
-      <ul className="space-y-1 text-sm">
-        {SECTIONS.map((s) => {
-          const complete = isPRDSectionComplete(initiative, s.id);
-          return (
-            <li key={s.id}>
-              <button
-                type="button"
-                onClick={() => onSelect(s.id)}
-                className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-gray-100"
-              >
-                <span
-                  className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded ${
-                    complete
-                      ? 'bg-emerald-500 text-white'
-                      : 'border border-gray-300 bg-white'
-                  }`}
-                >
-                  {complete && (
-                    <svg
-                      className="h-2.5 w-2.5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden
+    <nav className="space-y-4">
+      {SECTION_PARTS.map((part) => (
+        <div key={part.part}>
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            Part {part.part} · {part.title}
+          </div>
+          <ul className="space-y-1 text-sm">
+            {SECTIONS.filter((s) => part.sectionIds.includes(s.id)).map((s) => {
+              const complete = isPRDSectionComplete(initiative, s.id);
+              return (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(s.id)}
+                    className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-gray-100"
+                  >
+                    <span
+                      className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded ${
+                        complete
+                          ? 'bg-emerald-500 text-white'
+                          : 'border border-gray-300 bg-white'
+                      }`}
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 011.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </span>
-                <span className="text-gray-500">{s.id}.</span>
-                <span className="text-gray-900">{s.title}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                      {complete && (
+                        <svg
+                          className="h-2.5 w-2.5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 011.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </span>
+                    <span className="text-gray-500">{s.id}.</span>
+                    <span className="text-gray-900">{s.title}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
     </nav>
+  );
+}
+
+function PartDivider({ part, title }: { part: number; title: string }) {
+  return (
+    <div className="pt-4">
+      <div className="border-t-2 border-gray-900 pt-3">
+        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+          Part {part}
+        </div>
+        <div className="mt-0.5 text-2xl font-semibold tracking-tight text-gray-900">
+          {title}
+        </div>
+      </div>
+    </div>
   );
 }
 
