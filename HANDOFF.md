@@ -65,7 +65,9 @@ src/
                          helpers (calculatePriorityScore, isPRDSectionComplete deps)
   store/index.ts       — Zustand store + persist middleware + version migration
   routes/              — Dashboard, NewInitiative, EditInitiative,
-                         InitiativeDetail, ScoreInitiative, Roadmap, PRDEdit
+                         InitiativeDetail, ScoreInitiative, Roadmap, PRDEdit,
+                         PRDView (standalone read-only PRD; routed OUTSIDE
+                         AppLayout so it has no app chrome)
   components/          — AppLayout, InitiativeForm, Combobox, MotionsPicker,
                          LifecycleSection, TimelineEditor, PathVendorEditor,
                          PRDLauncher, StageBadge, HealthBadge
@@ -75,6 +77,8 @@ src/
   lib/                 — lifecycle.ts (stage logic), prdProgress.ts (PRD
                          section completion), roadmap.ts (Gantt math),
                          backup.ts (JSON export/import), time.ts
+                         (incl. formatDate — date-only-safe),
+                         prdMarkdown.ts (Copy-as-Markdown for the PRD view)
 wrangler.jsonc         — Cloudflare deploy config (SPA routing)
 ```
 
@@ -124,7 +128,7 @@ the backup file format is `{ version, exportedAt, initiatives }`.
 
 ---
 
-## 7. What's been accomplished (Phases 0–4a, all shipped)
+## 7. What's been accomplished (Phases 0–4b, all shipped)
 
 - **Phase 0** — Scaffold, deploy pipeline.
 - **Phase 1** — Initiative Registry: add/edit/delete, filters, JSON backup
@@ -137,6 +141,11 @@ the backup file format is `{ version, exportedAt, initiatives }`.
 - **Phase 4a** — The 14-section PRD builder at `/initiatives/:id/prd`:
   auto-saving, collapsible sections, sticky TOC sidebar, GTM Motions taxonomy
   picker, Conditional Accountability Compact (Section 14).
+- **Phase 4b** — Printable PRD view at `/initiatives/:id/prd/view`: a
+  standalone read-only document (routed outside AppLayout), all 14 sections
+  with placeholders, `window.print()` → PDF, "Copy as Markdown", and a
+  three-part grouping (What & Why / Deployment / Implementation) shown as
+  Part dividers + a grouped TOC sidebar — mirrored into the PRD edit page.
 
 Structural decisions made along the way:
 - **Six lifecycle stages:** Prioritize → PRD → Calendar → Deploy → Pilot → GA.
@@ -173,6 +182,15 @@ Structural decisions made along the way:
    batch of work.
 8. **Drive sync + `node_modules`** can be slow. Expect it; it's not a bug.
 9. **The user works in checkpoints** — see Section 10.
+10. **Standalone full-page routes** (e.g. `PRDView`) belong OUTSIDE the
+    `<Route element={<AppLayout />}>` block in `App.tsx`, so they render with
+    no app header/footer. React Router ranks by specificity, so route order
+    within `<Routes>` does not matter.
+11. **Hard-refresh after deploy when reviewing.** This is a static SPA — a
+    browser tab opened before a deploy keeps running the old JS bundle until
+    a full reload. A new route can appear "broken" (it falls through to the
+    catch-all → `/`) purely because the open tab predates the deploy. Tell
+    the user to hard-refresh the live URL before testing new routes.
 
 ---
 
@@ -180,23 +198,20 @@ Structural decisions made along the way:
 
 From [BUILD_PLAN.md](BUILD_PLAN.md). Recommended sequence:
 
-1. **Phase 4b — Printable PRD view** *(do next; smallest, highest tangible
-   value)*. Read-only `/initiatives/:id/prd/view` route + a print stylesheet
-   so users can `window.print()` the PRD to PDF and share it. Self-contained.
-2. **Phase 5 — Accountability Compact execution.** The Stage 5→6 ceremony
-   that converts the conditional Compact (PRD Section 14) into a binding
-   signed agreement, with the execution checklist. The conditional half is
-   already built in Phase 4a, so this layers cleanly on top.
-3. **Phase 6 — GA Tracking.** The 90-day reinforcement arc (Onboard /
+1. **Phase 5 — Accountability Compact execution** *(do next)*. The Stage 5→6
+   ceremony that converts the conditional Compact (PRD Section 14) into a
+   binding signed agreement, with the execution checklist. The conditional
+   half is already built in Phase 4a, so this layers cleanly on top.
+2. **Phase 6 — GA Tracking.** The 90-day reinforcement arc (Onboard /
    Reinforce / Embed), Manager Decoder Ring, decay-signal monitoring.
-4. **Phase 7 — Polish + PWA.** Landing page at `/`, installable PWA
+3. **Phase 7 — Polish + PWA.** Landing page at `/`, installable PWA
    (manifest + service worker), first-visit onboarding, empty states,
    responsive pass, code-split the GTM Motions taxonomy.
-5. **Phase 8 — Launch.** CNAME `roadmap.salesexcellence.xyz` → Cloudflare,
+4. **Phase 8 — Launch.** CNAME `roadmap.salesexcellence.xyz` → Cloudflare,
    final QA, distribution (LinkedIn, newsletter).
 
-The order follows the lifecycle flow and ships tangible value early. 4b and 5
-are both small-to-medium; 6 and 7 are larger.
+The order follows the lifecycle flow and ships tangible value early. 5 is
+small-to-medium; 6 and 7 are larger.
 
 ---
 

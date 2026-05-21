@@ -31,7 +31,7 @@ We started on Netlify free tier (300 credits/month, 15 credits per production de
 - **State:** Zustand with `persist` middleware → automatic `localStorage` sync
 - **Persistence model:** Browser-only `localStorage`. No backend, no accounts, no analytics, no PII collection.
 - **Backup pattern:** Auto-save on every change + JSON export/import + "last backed up" indicator + periodic backup nudges
-- **Print/export:** `window.print()` with print-specific stylesheets (planned for Phase 4b PRD viewer)
+- **Print/export:** `window.print()` with a print stylesheet on the read-only PRD view; "Copy as Markdown" for portable export (Phase 4b)
 - **Routing:** React Router 6 with URL-driven state for `viewedStage` (`?stage=`) and Roadmap "from" tracking (`?from=`)
 - **Hosting:** Cloudflare Pages, auto-deployed from GitHub `main` branch via Wrangler
 - **No environment variables, no secrets, no server-side anything.** Truly zero ops.
@@ -102,9 +102,12 @@ Each phase is independently shippable. Already shipped → ✅. Planned → ☐.
 - Conditional Accountability Compact (Section 14): four commitment cards with editable [X] placeholders, conditional sign-off status, escalation callout when status is "No"
 - Lifecycle Stage 2 PRD checklist auto-checks all 14 sections via `isPRDSectionComplete()`
 
-### Phase 4b — Printable PRD View ☐
-- `/initiatives/:id/prd/view` read-only printable layout
-- Print stylesheet for `window.print()` → PDF export
+### Phase 4b — Printable PRD View ✅
+- `/initiatives/:id/prd/view` standalone read-only PRD document, rendered outside the app chrome so it reads as a real document
+- All 14 sections render, with muted "Not yet documented" placeholders for fields not yet filled in
+- Print stylesheet for `window.print()` → PDF export; `document.title` set to `<name> - PRD - <date>` so the saved PDF and print header use a meaningful filename
+- "Copy as Markdown" button exports the full PRD (`lib/prdMarkdown.ts`) for pasting into Notion / Docs / Slack
+- Three-part information architecture (What & Why / Deployment / Implementation) shown as in-document Part dividers plus a sticky grouped table-of-contents sidebar; the same grouping is mirrored into the PRD edit page
 
 ### Phase 5 — Accountability Compact: Execution ☐
 - Stage 5 → 6 gate ceremony at `/initiatives/:id/compact/execute`
