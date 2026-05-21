@@ -48,7 +48,7 @@ We started on Netlify free tier (300 credits/month, 15 credits per production de
   - CARET scoring (Roster + per-factor panel scoring with divergence detection)
   - Stage transition gate reviews
   - Pilot decision (Proceed to GA / Fix and Re-Pilot / Kill) — Phase 6
-  - Accountability Compact execution (Stage 6, Commitment) — Phase 7
+  - Accountability Compact execution (Stage 6, Commitments) — Phase 7
 - **PRD form** is its own dedicated route at `/initiatives/:id/prd` — 14 collapsible sections with a sticky table-of-contents sidebar showing per-section completion
 
 ---
@@ -112,9 +112,10 @@ Each phase is independently shippable. Already shipped → ✅. Planned → ☐.
 > **Re-sequenced (2026-05-21).** The original plan jumped from the PRD straight
 > to the Compact execution, skipping real Deploy and Pilot work. Phases 5–8 now
 > follow the lifecycle in order, and the Accountability Compact execution has
-> been promoted to its own seventh stage — **Commitment** — between Pilot and GA,
-> to reinforce its importance (the same move that made PRD its own stage). The
-> lifecycle is now: Prioritize → PRD → Calendar → Deploy → Pilot → Commitment → GA.
+> been promoted to its own seventh stage — **Commitments** — between Pilot and
+> GA, to reinforce its importance (the same move that made PRD its own stage).
+> The lifecycle is now: Prioritize → PRD → Calendar → Deploy → Pilot →
+> Commitments → GA.
 
 ### Phase 5 — Deploy (Stage 4) ☐
 - Workstream tracker: a per-workstream status (Not started / In progress / Blocked / Done) on the PRD §12 workstreams, edited inline in the Stage 4 lifecycle view, with an "X of N done" progress count; confirm any TBD owners/dates here
@@ -124,13 +125,14 @@ Each phase is independently shippable. Already shipped → ✅. Planned → ☐.
 ### Phase 6 — Pilot (Stage 5) ☐
 - Per-metric pilot result entry: a free-text `result` value per PRD §6 metric, shown as baseline → target → result across all three layers
 - Qualitative feedback capture: three buckets — What worked / What didn't / What's missing & should be added
-- Proceed / Fix-and-Re-Pilot / Kill decision recorder: surfaces the PRD §11 pre-agreed criteria next to the metric results and feedback; records the outcome + rationale + date. The outcome drives the lifecycle — Proceed advances to Commitment, Kill moves the initiative to Killed, Fix keeps it in Pilot
+- Proceed / Fix-and-Re-Pilot / Kill decision recorder: surfaces the PRD §11 pre-agreed criteria next to the metric results and feedback; records the outcome + rationale + date. The outcome drives the lifecycle — Proceed advances to Commitments, Kill moves the initiative to Killed, Fix keeps it in Pilot
 
-### Phase 7 — Commitment (Stage 6 — NEW lifecycle stage) ☐
-- A new seventh lifecycle stage between Pilot and GA — `STORE_VERSION` bump and a new `'commitment'` Stage value
-- Compact execution ceremony at `/initiatives/:id/compact/execute`: converts the conditional Compact (PRD §14) into an executed/binding state
-- Displays the four committed terms as binding agreement text, with the numbers filled in from §14
-- Execution checklist: signed, managers briefed, coaching cadence calendared, exec communication scheduled, accountability check-in dates set — plus the GA-readiness items (enablement ready, dashboard built, ownership continuity)
+### Phase 7 — Commitments (Stage 6 — NEW lifecycle stage) ☐
+- A new seventh lifecycle stage between Pilot and GA — `STORE_VERSION` bump and a new `'commitments'` Stage value
+- Two sections: **the Executive Sponsor's Commitments** (the Accountability Compact) and **the Initiative Owner's Commitments** (GA-readiness)
+- Compact execution ceremony at `/initiatives/:id/compact/execute`: converts the conditional Compact (PRD §14) into an executed/binding state; displays the four committed terms as binding agreement text with the numbers filled in from §14
+- Executive Sponsor checklist: signed, managers briefed, coaching cadence calendared, exec communication scheduled, accountability check-in dates set
+- Initiative Owner checklist: enablement ready, measurement dashboard built, ownership continuity confirmed
 - "Exec reluctant → escalate" path mirroring the §14 "No" callout
 
 ### Phase 8 — GA Tracking (Stage 7) ☐

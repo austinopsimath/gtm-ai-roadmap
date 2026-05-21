@@ -150,7 +150,7 @@ the backup file format is `{ version, exportedAt, initiatives }`.
 Structural decisions made along the way:
 - **Lifecycle stages:** the shipped code has six — Prioritize → PRD → Calendar
   → Deploy → Pilot → GA. PRD is its own stage (Stage 2), *before* Calendar —
-  you plan before you schedule. A seventh stage, **Commitment** (the
+  you plan before you schedule. A seventh stage, **Commitments** (the
   Accountability Compact execution), is planned between Pilot and GA in
   Phase 7 — see Section 9. The framework markdown already reflects all seven.
 - **Naming quirk:** the Calendar stage's internal key is still `'roadmap'`
@@ -208,11 +208,13 @@ Compact execution, skipping real Deploy and Pilot work. Recommended sequence:
 2. **Phase 6 — Pilot (Stage 5).** Per-metric result entry (baseline → target →
    result), qualitative feedback (What worked / didn't / missing), and the
    Proceed / Fix-and-Re-Pilot / Kill decision recorder.
-3. **Phase 7 — Commitment (Stage 6 — NEW stage).** A new seventh lifecycle
-   stage between Pilot and GA: the Accountability Compact execution ceremony.
-   Promoted from a checklist item to its own stage to reinforce its
-   importance (same move as making PRD its own stage). Requires a
-   `STORE_VERSION` bump and a new `'commitment'` Stage value.
+3. **Phase 7 — Commitments (Stage 6 — NEW stage).** A new seventh lifecycle
+   stage between Pilot and GA, in two sections: the Executive Sponsor's
+   Commitments (the Accountability Compact execution ceremony) and the
+   Initiative Owner's Commitments (GA-readiness). Promoted from a checklist
+   item to its own stage to reinforce its importance (same move as making
+   PRD its own stage). Requires a `STORE_VERSION` bump and a new
+   `'commitments'` Stage value.
 4. **Phase 8 — GA Tracking (Stage 7).** The 90-day reinforcement arc
    (Onboard / Reinforce / Embed), Manager Decoder Ring, decay-signal
    monitoring.
@@ -223,8 +225,8 @@ Compact execution, skipping real Deploy and Pilot work. Recommended sequence:
    final QA, distribution.
 
 The lifecycle is now seven stages: Prioritize → PRD → Calendar → Deploy →
-Pilot → Commitment → GA. The framework markdown reflects all seven; the app
-code stays at six until Phase 7 ships the `'commitment'` stage.
+Pilot → Commitments → GA. The framework markdown reflects all seven; the app
+code stays at six until Phase 7 ships the `'commitments'` stage.
 
 ---
 
