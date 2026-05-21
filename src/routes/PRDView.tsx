@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useRoadmapStore } from '../store';
 import {
@@ -76,6 +76,45 @@ const RISK_ORDER: {
   { key: 'vendorLockIn', label: 'Vendor Lock-In', buyOnly: true },
 ];
 
+const SECTION_GROUPS: {
+  part: number;
+  title: string;
+  sections: { number: number; label: string }[];
+}[] = [
+  {
+    part: 1,
+    title: 'What & Why',
+    sections: [
+      { number: 1, label: 'Initiative Summary' },
+      { number: 2, label: 'Prioritization' },
+      { number: 3, label: 'Audiences Served' },
+      { number: 4, label: 'GTM Motions' },
+      { number: 5, label: 'Usage Frequency' },
+      { number: 6, label: 'Success Metrics' },
+    ],
+  },
+  {
+    part: 2,
+    title: 'Deployment',
+    sections: [
+      { number: 7, label: 'Path: Build or Buy' },
+      { number: 8, label: 'Systems & Integrations' },
+      { number: 9, label: 'Data Architecture' },
+      { number: 10, label: 'Risk Assessment' },
+    ],
+  },
+  {
+    part: 3,
+    title: 'Implementation',
+    sections: [
+      { number: 11, label: 'Pilot Plan' },
+      { number: 12, label: 'Workstreams' },
+      { number: 13, label: 'Approval Mechanism' },
+      { number: 14, label: 'Conditional Compact' },
+    ],
+  },
+];
+
 function fmtNum(v: number): string {
   return Number.isInteger(v) ? String(v) : v.toFixed(2);
 }
@@ -86,6 +125,16 @@ export default function PRDView() {
     s.initiatives.find((i) => i.id === id),
   );
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!initiative) return;
+    const previousTitle = document.title;
+    const date = new Date().toISOString().slice(0, 10);
+    document.title = `${initiative.name} - PRD - ${date}`;
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [initiative]);
 
   if (!initiative) return <Navigate to="/" replace />;
 
@@ -102,7 +151,7 @@ export default function PRDView() {
   return (
     <div className="min-h-full bg-gray-100 print:bg-white">
       <div className="no-print sticky top-0 z-10 border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <Link
             to={`/initiatives/${initiative.id}/prd`}
             className="text-sm text-gray-500 hover:text-gray-700"
@@ -126,22 +175,98 @@ export default function PRDView() {
         </div>
       </div>
 
-      <div className="mx-auto my-8 max-w-3xl bg-white px-10 py-12 shadow-sm print:my-0 print:max-w-none print:px-0 print:py-0 print:shadow-none">
-        <DocumentHeader initiative={initiative} />
-        <Section1 initiative={initiative} />
-        <Section2 initiative={initiative} />
-        <Section3 initiative={initiative} />
-        <Section4 initiative={initiative} />
-        <Section5 initiative={initiative} />
-        <Section6 initiative={initiative} />
-        <Section7 initiative={initiative} />
-        <Section8 initiative={initiative} />
-        <Section9 initiative={initiative} />
-        <Section10 initiative={initiative} />
-        <Section11 initiative={initiative} />
-        <Section12 initiative={initiative} />
-        <Section13 initiative={initiative} />
-        <Section14 initiative={initiative} />
+      <div className="mx-auto my-8 flex max-w-6xl gap-8 px-4 print:my-0 print:block print:max-w-none print:px-0">
+        <aside className="no-print hidden w-56 shrink-0 lg:block">
+          <TableOfContents />
+        </aside>
+        <article className="min-w-0 flex-1 bg-white px-10 py-12 shadow-sm print:px-0 print:py-0 print:shadow-none">
+          <DocumentHeader initiative={initiative} />
+          <GroupHeader part={1} title="What & Why" first />
+          <Section1 initiative={initiative} />
+          <Section2 initiative={initiative} />
+          <Section3 initiative={initiative} />
+          <Section4 initiative={initiative} />
+          <Section5 initiative={initiative} />
+          <Section6 initiative={initiative} />
+          <GroupHeader part={2} title="Deployment" />
+          <Section7 initiative={initiative} />
+          <Section8 initiative={initiative} />
+          <Section9 initiative={initiative} />
+          <Section10 initiative={initiative} />
+          <GroupHeader part={3} title="Implementation" />
+          <Section11 initiative={initiative} />
+          <Section12 initiative={initiative} />
+          <Section13 initiative={initiative} />
+          <Section14 initiative={initiative} />
+        </article>
+      </div>
+    </div>
+  );
+}
+
+function TableOfContents() {
+  const scrollTo = (elementId: string) => {
+    document
+      .getElementById(elementId)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  return (
+    <nav className="sticky top-20">
+      <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        Contents
+      </div>
+      <div className="space-y-4">
+        {SECTION_GROUPS.map((group) => (
+          <div key={group.part}>
+            <button
+              type="button"
+              onClick={() => scrollTo(`prd-part-${group.part}`)}
+              className="mb-1 block text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-900"
+            >
+              Part {group.part} · {group.title}
+            </button>
+            <ul className="space-y-0.5">
+              {group.sections.map((s) => (
+                <li key={s.number}>
+                  <button
+                    type="button"
+                    onClick={() => scrollTo(`prd-section-${s.number}`)}
+                    className="block w-full rounded px-2 py-1 text-left text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    <span className="text-gray-400">{s.number}.</span>{' '}
+                    {s.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+function GroupHeader({
+  part,
+  title,
+  first,
+}: {
+  part: number;
+  title: string;
+  first?: boolean;
+}) {
+  return (
+    <div
+      id={`prd-part-${part}`}
+      className={`scroll-mt-24 break-after-avoid border-t-2 border-gray-900 pt-3 ${
+        first ? 'mt-8' : 'mt-14'
+      }`}
+    >
+      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+        Part {part}
+      </div>
+      <div className="mt-0.5 text-xl font-semibold tracking-tight text-gray-900">
+        {title}
       </div>
     </div>
   );
@@ -199,8 +324,11 @@ function Section({
 }) {
   return (
     <section
+      id={`prd-section-${number}`}
       className={
-        first ? 'mt-8' : 'mt-8 border-t border-gray-200 pt-6'
+        first
+          ? 'mt-8 scroll-mt-24'
+          : 'mt-8 scroll-mt-24 border-t border-gray-200 pt-6'
       }
     >
       <h2 className="break-after-avoid">
@@ -462,7 +590,7 @@ function Section6({ initiative }: { initiative: Initiative }) {
 
 function Section7({ initiative }: { initiative: Initiative }) {
   return (
-    <Section number={7} title="Path: Build or Buy">
+    <Section number={7} title="Path: Build or Buy" first>
       <FieldBlock label="Path">
         <p className="text-sm text-gray-700">
           {initiative.path
@@ -549,7 +677,7 @@ function Section10({ initiative }: { initiative: Initiative }) {
 function Section11({ initiative }: { initiative: Initiative }) {
   const pp = initiative.prd.pilotPlan;
   return (
-    <Section number={11} title="Pilot Plan">
+    <Section number={11} title="Pilot Plan" first>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldBlock label="Cohort">
           <Prose value={pp.cohortDescription} />
